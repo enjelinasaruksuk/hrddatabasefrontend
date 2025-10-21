@@ -24,7 +24,11 @@ export default function AddEmployee() {
                 <input className="w-full border border-yellow-300 rounded p-2 bg-white" />
               </div>
               <div>
+<<<<<<< Updated upstream
                 <label className="text-gray-700">Mothers Name</label>
+=======
+                <label className="text-gray-700">Mother's Name</label>
+>>>>>>> Stashed changes
                 <input className="w-full border border-yellow-300 rounded p-2 bg-white" />
               </div>
               <div>

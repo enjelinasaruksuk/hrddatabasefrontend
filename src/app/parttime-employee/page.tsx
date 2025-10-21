@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+<<<<<<< Updated upstream
 import { usePathname, useRouter } from "next/navigation";
+=======
+>>>>>>> Stashed changes
 import React, { useState } from "react";
 import {
   FiEdit,
@@ -10,13 +13,17 @@ import {
   FiBriefcase,
   FiUsers,
   FiLogOut,
+<<<<<<< Updated upstream
   FiBell,
   FiUser,
+=======
+>>>>>>> Stashed changes
 } from "react-icons/fi";
 
 export default function Page() {
   const [showDivision, setShowDivision] = useState(false);
   const [showDepartment, setShowDepartment] = useState(false);
+<<<<<<< Updated upstream
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -33,6 +40,8 @@ export default function Page() {
   const handleLogoutCancel = () => {
     setShowLogoutModal(false);
   };
+=======
+>>>>>>> Stashed changes
 
   return (
     <div className="min-h-screen bg-gray-100 font-['Cambria']">
@@ -49,6 +58,7 @@ export default function Page() {
           </h1>
         </div>
 
+<<<<<<< Updated upstream
         <div className="flex items-center gap-2">
           <Link href="/notifications">
             <button
@@ -70,12 +80,31 @@ export default function Page() {
             aria-label="logout"
             onClick={handleLogoutClick}
             className="ml-2 bg-red-600 text-white p-2 rounded-full shadow hover:bg-red-700 transition"
+=======
+        <div className="flex items-center gap--5">
+          <button
+            aria-label="notifications"
+            className="p-2 rounded-full hover:bg-yellow-200"
+          >
+            🔔
+          </button>
+          <button
+            aria-label="profile"
+            className="p-2 rounded-full hover:bg-yellow-200"
+          >
+            👤
+          </button>
+          <button
+            aria-label="logout"
+            className="ml-2 bg-red-600 text-white p-2 rounded-full shadow hover:bg-red-700"
+>>>>>>> Stashed changes
           >
             <FiLogOut size={18} />
           </button>
         </div>
       </header>
 
+<<<<<<< Updated upstream
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -107,10 +136,13 @@ export default function Page() {
         </div>
       )}
 
+=======
+>>>>>>> Stashed changes
       {/* Body */}
       <div className="flex min-h-[calc(100vh-5rem)]">
         {/* Sidebar */}
         <aside className="w-64 bg-yellow-300 p-5 flex flex-col gap-2">
+<<<<<<< Updated upstream
           <Link href="/dashboard">
             <div className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
               pathname === "/dashboard" 
@@ -163,6 +195,31 @@ export default function Page() {
           </Link>
         </aside>
 
+=======
+          <div className="flex items-center gap-3 hover:bg-yellow-200 p-2 rounded cursor-pointer">
+            <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
+              🏠
+            </div>
+            <span className="text-sm font-medium">Dashboard</span>
+          </div>
+
+          <div className="flex items-center gap-3 hover:bg-yellow-200 p-2 rounded cursor-pointer">
+            <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
+              📁
+            </div>
+            <span className="text-sm font-medium">Fulltime Employee</span>
+          </div>
+
+          <div className="flex items-center gap-3 bg-yellow-200 p-2 rounded cursor-pointer">
+            <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
+              📁
+            </div>
+            <span className="text-sm font-semibold">Parttime Employee</span>
+          </div>
+        </aside>
+
+
+>>>>>>> Stashed changes
         {/* Main Content */}
         <main className="flex-1 bg-white p-8 relative">
           {/* Header Section */}
@@ -201,7 +258,12 @@ export default function Page() {
                     <FiBriefcase size={14} />
                     Division
                     <FiChevronDown
+<<<<<<< Updated upstream
                       className={`transition-transform duration-200 ${showDivision ? "rotate-180" : ""}`}
+=======
+                      className={`transition-transform duration-200 ${showDivision ? "rotate-180" : ""
+                        }`}
+>>>>>>> Stashed changes
                     />
                   </button>
                   {showDivision && (
@@ -232,7 +294,12 @@ export default function Page() {
                     <FiUsers size={14} />
                     Department
                     <FiChevronDown
+<<<<<<< Updated upstream
                       className={`transition-transform duration-200 ${showDepartment ? "rotate-180" : ""}`}
+=======
+                      className={`transition-transform duration-200 ${showDepartment ? "rotate-180" : ""
+                        }`}
+>>>>>>> Stashed changes
                     />
                   </button>
                   {showDepartment && (
@@ -261,7 +328,11 @@ export default function Page() {
           {/* Table Section */}
           <div className="overflow-x-auto">
             <table className="w-full border-collapse border border-gray-300 text-sm">
+<<<<<<< Updated upstream
               <thead className="bg-gray-200 font-semibold">
+=======
+              <thead className="bg-gray-200">
+>>>>>>> Stashed changes
                 <tr>
                   <th className="border border-gray-300 px-2 py-2 w-12">No</th>
                   <th className="border border-gray-300 px-4 py-2">NIK</th>
@@ -269,7 +340,11 @@ export default function Page() {
                   <th className="border border-gray-300 px-4 py-2">Division</th>
                   <th className="border border-gray-300 px-4 py-2">Department</th>
                   <th className="border border-gray-300 px-4 py-2">Position</th>
+<<<<<<< Updated upstream
                   <th className="border border-gray-300 px-4 py-2 text-center w-28">
+=======
+                  <th className="border border-gray-300 px-2 py-2 text-center w-28">
+>>>>>>> Stashed changes
                     Action
                   </th>
                   <th className="border border-gray-300 px-4 py-2 text-center">
@@ -277,9 +352,16 @@ export default function Page() {
                   </th>
                 </tr>
               </thead>
+<<<<<<< Updated upstream
               <tbody>
                 {Array.from({ length: 15 }).map((_, i) => (
                   <tr key={i} className="hover:bg-gray-50 transition">
+=======
+
+              <tbody>
+                {Array.from({ length: 15 }).map((_, i) => (
+                  <tr key={i} className="hover:bg-gray-50">
+>>>>>>> Stashed changes
                     <td className="border border-gray-300 px-2 py-2 text-center">
                       {i + 1}
                     </td>
@@ -288,20 +370,36 @@ export default function Page() {
                     <td className="border border-gray-300 px-4 py-2"></td>
                     <td className="border border-gray-300 px-4 py-2"></td>
                     <td className="border border-gray-300 px-4 py-2"></td>
+<<<<<<< Updated upstream
                     <td className="border border-gray-300 px-2 py-2 text-center">
                       <div className="flex justify-center gap-2">
+=======
+
+                    <td className="border border-gray-300 px-4 py-2 text-center">
+                      <div className="flex justify-center gap-3">
+>>>>>>> Stashed changes
                         <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 flex items-center gap-1">
                           <FiEdit size={16} />
                           <span>Edit</span>
                         </button>
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
                         <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 flex items-center gap-1">
                           <FiTrash2 size={16} />
                           <span>Delete</span>
                         </button>
                       </div>
                     </td>
+<<<<<<< Updated upstream
                     <td className="border border-gray-300 px-4 py-2 text-center">
                       <Link href={`/parttime-employee/detail/${i + 1}`}>
+=======
+
+                    <td className="border border-gray-300 px-4 py-2 text-center">
+                      <Link href={`/fulltime-employee/detail/${i + 1}`}>
+>>>>>>> Stashed changes
                         <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
                           View
                         </button>
@@ -316,4 +414,8 @@ export default function Page() {
       </div>
     </div>
   );
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> Stashed changes
