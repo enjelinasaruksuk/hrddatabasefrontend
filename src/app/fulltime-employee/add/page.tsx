@@ -24,7 +24,7 @@ export default function AddEmployee() {
                 <input className="w-full border border-yellow-300 rounded p-2 bg-white" />
               </div>
               <div>
-                <label className="text-gray-700">Mother's Name</label>
+                <label className="text-gray-700">Mothers Name</label>
                 <input className="w-full border border-yellow-300 rounded p-2 bg-white" />
               </div>
               <div>

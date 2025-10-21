@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
   FiEdit,
@@ -9,11 +10,29 @@ import {
   FiBriefcase,
   FiUsers,
   FiLogOut,
+  FiBell,
+  FiUser,
 } from "react-icons/fi";
 
 export default function Page() {
   const [showDivision, setShowDivision] = useState(false);
   const [showDepartment, setShowDepartment] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    setShowLogoutModal(false);
+    router.push("/home");
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 font-['Cambria']">
@@ -30,54 +49,119 @@ export default function Page() {
           </h1>
         </div>
 
-        <div className="flex items-center gap--5">
-          <button
-            aria-label="notifications"
-            className="p-2 rounded-full hover:bg-yellow-200"
-          >
-            🔔
-          </button>
-          <button
-            aria-label="profile"
-            className="p-2 rounded-full hover:bg-yellow-200"
-          >
-            👤
-          </button>
+        <div className="flex items-center gap-2">
+          <Link href="/notifications">
+            <button
+              aria-label="notifications"
+              className="p-2 rounded-full hover:bg-yellow-200 transition"
+            >
+              <FiBell size={20} />
+            </button>
+          </Link>
+          <Link href="/profile">
+            <button
+              aria-label="profile"
+              className="p-2 rounded-full hover:bg-yellow-200 transition"
+            >
+              <FiUser size={20} />
+            </button>
+          </Link>
           <button
             aria-label="logout"
-            className="ml-2 bg-red-600 text-white p-2 rounded-full shadow hover:bg-red-700"
+            onClick={handleLogoutClick}
+            className="ml-2 bg-red-600 text-white p-2 rounded-full shadow hover:bg-red-700 transition"
           >
             <FiLogOut size={18} />
           </button>
         </div>
       </header>
 
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <FiLogOut className="text-red-600" size={24} />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-800">Logout Confirmation</h3>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to logout? You will be redirected to the home page.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleLogoutCancel}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogoutConfirm}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition font-medium"
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Body */}
       <div className="flex min-h-[calc(100vh-5rem)]">
         {/* Sidebar */}
         <aside className="w-64 bg-yellow-300 p-5 flex flex-col gap-2">
-          <div className="flex items-center gap-3 hover:bg-yellow-200 p-2 rounded cursor-pointer">
-            <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
-              🏠
+          <Link href="/dashboard">
+            <div className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
+              pathname === "/dashboard" 
+                ? "bg-yellow-200 shadow-sm" 
+                : "hover:bg-yellow-200"
+            }`}>
+              <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
+                🏠
+              </div>
+              <span className={`text-sm ${
+                pathname === "/dashboard" ? "font-semibold" : "font-medium"
+              }`}>
+                Dashboard
+              </span>
             </div>
-            <span className="text-sm font-medium">Dashboard</span>
-          </div>
+          </Link>
 
-          <div className="flex items-center gap-3 hover:bg-yellow-200 p-2 rounded cursor-pointer">
-            <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
-              📁
+          <Link href="/fulltime-employee">
+            <div className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
+              pathname?.startsWith("/fulltime-employee") 
+                ? "bg-yellow-200 shadow-sm" 
+                : "hover:bg-yellow-200"
+            }`}>
+              <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
+                📁
+              </div>
+              <span className={`text-sm ${
+                pathname?.startsWith("/fulltime-employee") ? "font-semibold" : "font-medium"
+              }`}>
+                Fulltime Employee
+              </span>
             </div>
-            <span className="text-sm font-medium">Fulltime Employee</span>
-          </div>
+          </Link>
 
-          <div className="flex items-center gap-3 bg-yellow-200 p-2 rounded cursor-pointer">
-            <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
-              📁
+          <Link href="/parttime-employee">
+            <div className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
+              pathname?.startsWith("/parttime-employee") 
+                ? "bg-yellow-200 shadow-sm" 
+                : "hover:bg-yellow-200"
+            }`}>
+              <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
+                📁
+              </div>
+              <span className={`text-sm ${
+                pathname?.startsWith("/parttime-employee") ? "font-semibold" : "font-medium"
+              }`}>
+                Parttime Employee
+              </span>
             </div>
-            <span className="text-sm font-semibold">Parttime Employee</span>
-          </div>
+          </Link>
         </aside>
-
 
         {/* Main Content */}
         <main className="flex-1 bg-white p-8 relative">
@@ -117,8 +201,7 @@ export default function Page() {
                     <FiBriefcase size={14} />
                     Division
                     <FiChevronDown
-                      className={`transition-transform duration-200 ${showDivision ? "rotate-180" : ""
-                        }`}
+                      className={`transition-transform duration-200 ${showDivision ? "rotate-180" : ""}`}
                     />
                   </button>
                   {showDivision && (
@@ -149,8 +232,7 @@ export default function Page() {
                     <FiUsers size={14} />
                     Department
                     <FiChevronDown
-                      className={`transition-transform duration-200 ${showDepartment ? "rotate-180" : ""
-                        }`}
+                      className={`transition-transform duration-200 ${showDepartment ? "rotate-180" : ""}`}
                     />
                   </button>
                   {showDepartment && (
@@ -179,7 +261,7 @@ export default function Page() {
           {/* Table Section */}
           <div className="overflow-x-auto">
             <table className="w-full border-collapse border border-gray-300 text-sm">
-              <thead className="bg-gray-200">
+              <thead className="bg-gray-200 font-semibold">
                 <tr>
                   <th className="border border-gray-300 px-2 py-2 w-12">No</th>
                   <th className="border border-gray-300 px-4 py-2">NIK</th>
@@ -187,7 +269,7 @@ export default function Page() {
                   <th className="border border-gray-300 px-4 py-2">Division</th>
                   <th className="border border-gray-300 px-4 py-2">Department</th>
                   <th className="border border-gray-300 px-4 py-2">Position</th>
-                  <th className="border border-gray-300 px-2 py-2 text-center w-28">
+                  <th className="border border-gray-300 px-4 py-2 text-center w-28">
                     Action
                   </th>
                   <th className="border border-gray-300 px-4 py-2 text-center">
@@ -195,10 +277,9 @@ export default function Page() {
                   </th>
                 </tr>
               </thead>
-
               <tbody>
                 {Array.from({ length: 15 }).map((_, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
+                  <tr key={i} className="hover:bg-gray-50 transition">
                     <td className="border border-gray-300 px-2 py-2 text-center">
                       {i + 1}
                     </td>
@@ -207,23 +288,20 @@ export default function Page() {
                     <td className="border border-gray-300 px-4 py-2"></td>
                     <td className="border border-gray-300 px-4 py-2"></td>
                     <td className="border border-gray-300 px-4 py-2"></td>
-
-                    <td className="border border-gray-300 px-4 py-2 text-center">
-                      <div className="flex justify-center gap-3">
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      <div className="flex justify-center gap-2">
                         <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 flex items-center gap-1">
                           <FiEdit size={16} />
                           <span>Edit</span>
                         </button>
-
                         <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 flex items-center gap-1">
                           <FiTrash2 size={16} />
                           <span>Delete</span>
                         </button>
                       </div>
                     </td>
-
                     <td className="border border-gray-300 px-4 py-2 text-center">
-                      <Link href={`/fulltime-employee/detail/${i + 1}`}>
+                      <Link href={`/parttime-employee/detail/${i + 1}`}>
                         <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
                           View
                         </button>

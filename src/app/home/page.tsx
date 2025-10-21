@@ -1,12 +1,14 @@
 "use client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Mail, Phone, Clock, MapPin } from "lucide-react";
 
 export default function HomePage() {
+  const router = useRouter();
   return (
     <main
       className="flex flex-col min-h-screen bg-white"
-      style={{ fontFamily: "Cambria, serif" }}
+      style={{ fontFamily: "Cambria, Georgia, serif" }} // ✅ Cambria + fallback
     >
       {/* HEADER */}
       <header className="flex justify-between items-center px-10 py-4 bg-[#F8CE0D] border-b border-black">
@@ -14,7 +16,7 @@ export default function HomePage() {
           <Image
             src="/image/LOGOSIMKARIN.png"
             alt="Logo"
-            width={60} // lebih besar
+            width={60}
             height={60}
           />
           <div>
@@ -24,7 +26,11 @@ export default function HomePage() {
           </div>
         </div>
 
-        <button className="px-5 py-[4px] bg-[#34D534] rounded-full text-black text-base font-semibold hover:bg-[#2CC02D] active:bg-[#27A828] transition-colors duration-200">
+        {/* Tombol login diarahkan ke halaman login */}
+        <button
+          onClick={() => router.push("/login")}
+          className="px-5 py-[4px] bg-[#34D534] rounded-full text-black text-base font-semibold hover:bg-[#2CC02D] active:bg-[#27A828] transition-colors duration-200"
+        >
           Login
         </button>
       </header>
@@ -38,7 +44,6 @@ export default function HomePage() {
       >
         {/* Box dengan background logo */}
         <div className="relative w-full max-w-5xl bg-white/90 rounded-xl shadow-md overflow-hidden h-[450px]">
-          {/* Background transparan penuh */}
           <Image
             src="/image/PT.LKS.jpg"
             alt="Background LKS"
@@ -95,18 +100,16 @@ export default function HomePage() {
 
       {/* FOOTER */}
       <footer className="bg-[#FCEEAB] text-black px-12 py-6 flex justify-between items-start text-base">
-        {/* Left: Logo + Company */}
         <div className="flex items-center gap-3">
           <Image
             src="/image/LOGOLKS.png"
             alt="Logo PT LKS"
-            width={55} // lebih besar
+            width={55}
             height={55}
           />
           <p className="font-semibold text-lg">Lancang Kuning Sukses</p>
         </div>
 
-        {/* Center: Contact */}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Mail size={18} />
@@ -122,7 +125,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Right: Address */}
         <div className="flex items-start gap-3 max-w-xs text-right">
           <MapPin size={48} className="mt-1" />
           <p className="text-sm">
