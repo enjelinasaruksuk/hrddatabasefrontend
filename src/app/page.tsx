@@ -1,24 +1,14 @@
-import EmployeeCard from "./components/EmployeeCard";
-import EmployeeStats from "./components/EmployeeStats";
+"use client";
 import Layout from "./components/Layout";
 
-export default function Dashboard() {
-  const totalEmployees = 350;
-  const activeEmployees = 245;
-  const contractEmployees = 105;
 
+export default function DashboardPage() {
   return (
     <Layout>
-      <section>
-        <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <EmployeeCard total={totalEmployees} />
-          <EmployeeStats
-            active={activeEmployees}
-            contract={contractEmployees}
-          />
-        </div>
-      </section>
+      <div className="p-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Dashboard</h1>
+        <p>Selamat datang di dashboard HRD. Anda dapat melihat data karyawan secara keseluruhan di sini.</p>
+      </div>
     </Layout>
   );
 }
