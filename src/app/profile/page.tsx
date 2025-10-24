@@ -11,7 +11,9 @@ export default function ProfilePage() {
   const [fileName, setFileName] = useState("No File Chosen");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  // 🟡 Upload Foto Profil
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -22,14 +24,26 @@ export default function ProfilePage() {
     }
   };
 
+  // 🟢 Simpan Profil
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setSuccessMessage("✅ Profile berhasil diperbarui!");
     setTimeout(() => setSuccessMessage(null), 3000);
   };
 
+  // 🔴 Logout dengan konfirmasi
+  const handleLogoutClick = () => setShowLogoutModal(true);
+  const handleLogoutCancel = () => setShowLogoutModal(false);
+  const handleLogoutConfirm = () => {
+    setShowLogoutModal(false);
+    router.push("/"); // arahkan ke halaman login/home
+  };
+
   return (
-    <div className="flex h-screen bg-[#fffbea]" style={{ fontFamily: "Cambria, serif" }}>
+    <div
+      className="flex h-screen bg-[#fffbea]"
+      style={{ fontFamily: "Cambria, serif" }}
+    >
       {/* Sidebar */}
       <div className="w-1/5 bg-[#F7CF0D] flex flex-col items-center py-10">
         <Image
@@ -65,9 +79,9 @@ export default function ProfilePage() {
 
       {/* Main Content */}
       <div className="flex-1 bg-white p-10 relative overflow-y-auto">
-        {/* Logout */}
+        {/* 🔴 Tombol Logout */}
         <button
-          onClick={() => router.push("/")}
+          onClick={handleLogoutClick}
           className="absolute top-6 right-8 text-gray-800 hover:text-black transition-transform duration-200 hover:scale-110 active:scale-95"
         >
           <LogOut size={26} />
@@ -180,7 +194,33 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* animasi halus optional */}
+      {/* 🔴 Modal Konfirmasi Logout */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 animate-fadeIn">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm text-center">
+            <h3 className="text-lg font-semibold mb-2">Logout Confirmation</h3>
+            <p className="text-gray-600 mb-4">
+              Are you sure you want to logout?
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={handleLogoutCancel}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogoutConfirm}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Animasi */}
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -193,7 +233,7 @@ export default function ProfilePage() {
           }
         }
         .animate-fadeIn {
-          animation: fadeIn 0.4s ease-out;
+          animation: fadeIn 0.3s ease-out;
         }
       `}</style>
     </div>

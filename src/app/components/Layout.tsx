@@ -12,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const handleLogoutConfirm = () => {
     setShowLogoutModal(false);
-    router.push("/home");
+    router.push("/");
   };
 
   const handleLogoutCancel = () => {

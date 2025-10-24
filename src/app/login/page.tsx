@@ -9,19 +9,40 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("hr");
+  const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (role === "hr") router.push("/hr");
-    else if (role === "manajemen-it") router.push("/manajemen-it");
-    else alert("Invalid role selected!");
+
+    // Validasi input kosong
+    if (!username || !password) {
+      setError("⚠️ Username and password are required!");
+      return;
+    }
+
+    // Validasi panjang password harus tepat 8 karakter
+    if (password.length !== 8) {
+      setError("⚠️ Password must be exactly 8 characters long!");
+      return;
+    }
+
+    // Reset error kalau semua valid
+    setError("");
+
+    // Arahkan berdasarkan role
+    if (role === "hr") {
+      router.push("/dashboard");
+    } else if (role === "manajemen-it") {
+      router.push("/dashboard-manajemen");
+    } else {
+      setError("⚠️ Role tidak valid!");
+    }
   };
 
   return (
-    <div
-      className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#FFD54F] to-[#FFFFFF] font-[Cambria]"
-    >
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-[#FFD54F] to-[#FFFFFF] font-[Cambria]">
       <div className="flex bg-white shadow-md rounded-2xl p-8 w-[750px]">
+        {/* Bagian kiri logo */}
         <div className="flex flex-col items-center justify-center w-1/2 pr-6 border-r">
           <Image
             src="/image/simkarin-logo.jpg"
@@ -31,6 +52,7 @@ export default function LoginPage() {
           />
         </div>
 
+        {/* Bagian kanan form */}
         <div className="flex flex-col w-1/2 pl-6">
           <div className="flex items-center mb-4">
             <Image
@@ -42,7 +64,7 @@ export default function LoginPage() {
           </div>
 
           <p className="text-sm text-gray-600 mb-6">
-            Login to access the application.
+            Login untuk mengakses sistem SIMKARIN.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -54,6 +76,7 @@ export default function LoginPage() {
               className="w-full bg-yellow-50 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
             />
+
             <input
               type="password"
               placeholder="Password"
@@ -71,6 +94,13 @@ export default function LoginPage() {
               <option value="hr">HR</option>
               <option value="manajemen-it">Manajemen & IT</option>
             </select>
+
+            {/* Pesan error */}
+            {error && (
+              <p className="text-red-600 text-sm font-semibold text-center">
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"

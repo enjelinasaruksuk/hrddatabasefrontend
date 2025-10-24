@@ -1,10 +1,7 @@
 "use client";
 
 import Link from "next/link";
-<<<<<<< Updated upstream
 import { usePathname, useRouter } from "next/navigation";
-=======
->>>>>>> Stashed changes
 import React, { useState } from "react";
 import {
   FiEdit,
@@ -13,17 +10,13 @@ import {
   FiBriefcase,
   FiUsers,
   FiLogOut,
-<<<<<<< Updated upstream
   FiBell,
   FiUser,
-=======
->>>>>>> Stashed changes
 } from "react-icons/fi";
 
 export default function Page() {
   const [showDivision, setShowDivision] = useState(false);
   const [showDepartment, setShowDepartment] = useState(false);
-<<<<<<< Updated upstream
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -34,14 +27,12 @@ export default function Page() {
 
   const handleLogoutConfirm = () => {
     setShowLogoutModal(false);
-    router.push("/home");
+    router.push("/");
   };
 
   const handleLogoutCancel = () => {
     setShowLogoutModal(false);
   };
-=======
->>>>>>> Stashed changes
 
   return (
     <div className="min-h-screen bg-gray-100 font-['Cambria']">
@@ -58,9 +49,8 @@ export default function Page() {
           </h1>
         </div>
 
-<<<<<<< Updated upstream
         <div className="flex items-center gap-2">
-          <Link href="/notifications">
+          <Link href="/reminder">
             <button
               aria-label="notifications"
               className="p-2 rounded-full hover:bg-yellow-200 transition"
@@ -80,31 +70,12 @@ export default function Page() {
             aria-label="logout"
             onClick={handleLogoutClick}
             className="ml-2 bg-red-600 text-white p-2 rounded-full shadow hover:bg-red-700 transition"
-=======
-        <div className="flex items-center gap--5">
-          <button
-            aria-label="notifications"
-            className="p-2 rounded-full hover:bg-yellow-200"
-          >
-            🔔
-          </button>
-          <button
-            aria-label="profile"
-            className="p-2 rounded-full hover:bg-yellow-200"
-          >
-            👤
-          </button>
-          <button
-            aria-label="logout"
-            className="ml-2 bg-red-600 text-white p-2 rounded-full shadow hover:bg-red-700"
->>>>>>> Stashed changes
           >
             <FiLogOut size={18} />
           </button>
         </div>
       </header>
 
-<<<<<<< Updated upstream
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -113,10 +84,13 @@ export default function Page() {
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                 <FiLogOut className="text-red-600" size={24} />
               </div>
-              <h3 className="text-xl font-semibold text-gray-800">Logout Confirmation</h3>
+              <h3 className="text-xl font-semibold text-gray-800">
+                Logout Confirmation
+              </h3>
             </div>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to logout? You will be redirected to the home page.
+              Are you sure you want to logout? You will be redirected to the
+              home page.
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -136,90 +110,78 @@ export default function Page() {
         </div>
       )}
 
-=======
->>>>>>> Stashed changes
       {/* Body */}
       <div className="flex min-h-[calc(100vh-5rem)]">
         {/* Sidebar */}
         <aside className="w-64 bg-yellow-300 p-5 flex flex-col gap-2 font-[Cambria]">
-<<<<<<< Updated upstream
           <Link href="/dashboard">
-            <div className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
-              pathname === "/dashboard" 
-                ? "bg-yellow-200 shadow-sm" 
-                : "hover:bg-yellow-200"
-            }`}>
+            <div
+              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
+                pathname === "/dashboard"
+                  ? "bg-yellow-200 shadow-sm"
+                  : "hover:bg-yellow-200"
+              }`}
+            >
               <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
                 🏠
               </div>
-              <span className={`text-sm text-black ${
-                pathname === "/dashboard" ? "font-semibold" : "font-medium"
-              }`}>
+              <span
+                className={`text-sm text-black ${
+                  pathname === "/dashboard" ? "font-semibold" : "font-medium"
+                }`}
+              >
                 Dashboard
               </span>
             </div>
           </Link>
 
           <Link href="/fulltime-employee">
-            <div className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
-              pathname?.startsWith("/fulltime-employee") 
-                ? "bg-yellow-200 shadow-sm" 
-                : "hover:bg-yellow-200"
-            }`}>
+            <div
+              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
+                pathname?.startsWith("/fulltime-employee")
+                  ? "bg-yellow-200 shadow-sm"
+                  : "hover:bg-yellow-200"
+              }`}
+            >
               <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
                 📁
               </div>
-              <span className={`text-sm text-black ${
-                pathname?.startsWith("/fulltime-employee") ? "font-semibold" : "font-medium"
-              }`}>
+              <span
+                className={`text-sm text-black ${
+                  pathname?.startsWith("/fulltime-employee")
+                    ? "font-semibold"
+                    : "font-medium"
+                }`}
+              >
                 Fulltime Employee
               </span>
             </div>
           </Link>
 
           <Link href="/parttime-employee">
-            <div className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
-              pathname?.startsWith("/parttime-employee") 
-                ? "bg-yellow-200 shadow-sm" 
-                : "hover:bg-yellow-200"
-            }`}>
+            <div
+              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
+                pathname?.startsWith("/parttime-employee")
+                  ? "bg-yellow-200 shadow-sm"
+                  : "hover:bg-yellow-200"
+              }`}
+            >
               <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
                 📁
               </div>
-              <span className={`text-sm text-black ${
-                pathname?.startsWith("/parttime-employee") ? "font-semibold" : "font-medium"
-              }`}>
+              <span
+                className={`text-sm text-black ${
+                  pathname?.startsWith("/parttime-employee")
+                    ? "font-semibold"
+                    : "font-medium"
+                }`}
+              >
                 Parttime Employee
               </span>
             </div>
           </Link>
         </aside>
 
-=======
-          <div className="flex items-center gap-3 hover:bg-yellow-200 p-2 rounded cursor-pointer">
-            <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
-              🏠
-            </div>
-            <span className="text-sm font-medium text-black">Dashboard</span>
-          </div>
-
-          <div className="flex items-center gap-3 bg-yellow-200 p-2 rounded cursor-pointer">
-            <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
-              📁
-            </div>
-            <span className="text-sm font-semibold text-black">Fulltime Employee</span>
-          </div>
-
-          <div className="flex items-center gap-3 hover:bg-yellow-200 p-2 rounded cursor-pointer">
-            <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
-              📁
-            </div>
-            <span className="text-sm font-medium text-black">Parttime Employee</span>
-          </div>
-        </aside>
-
-
->>>>>>> Stashed changes
         {/* Main Content */}
         <main className="flex-1 bg-white p-8 relative">
           {/* Header Section */}
@@ -238,15 +200,9 @@ export default function Page() {
           </div>
 
           {/* Action Buttons */}
-<<<<<<< Updated upstream
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
-=======
-          <div className="flex items-center justify-between mb-4 relative">
-            <div className="flex items-center gap-3">
-              <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
->>>>>>> Stashed changes
                 <Link href="/fulltime-employee/add">+ Add</Link>
               </button>
 
@@ -263,12 +219,9 @@ export default function Page() {
                     <FiBriefcase size={14} />
                     Division
                     <FiChevronDown
-<<<<<<< Updated upstream
-                      className={`transition-transform duration-200 ${showDivision ? "rotate-180" : ""}`}
-=======
-                      className={`transition-transform duration-200 ${showDivision ? "rotate-180" : ""
-                        }`}
->>>>>>> Stashed changes
+                      className={`transition-transform duration-200 ${
+                        showDivision ? "rotate-180" : ""
+                      }`}
                     />
                   </button>
 
@@ -302,12 +255,9 @@ export default function Page() {
                     <FiUsers size={14} />
                     Department
                     <FiChevronDown
-<<<<<<< Updated upstream
-                      className={`transition-transform duration-200 ${showDepartment ? "rotate-180" : ""}`}
-=======
-                      className={`transition-transform duration-200 ${showDepartment ? "rotate-180" : ""
-                        }`}
->>>>>>> Stashed changes
+                      className={`transition-transform duration-200 ${
+                        showDepartment ? "rotate-180" : ""
+                      }`}
                     />
                   </button>
 
@@ -345,7 +295,9 @@ export default function Page() {
                   <th className="border border-gray-300 px-4 py-2">NIK</th>
                   <th className="border border-gray-300 px-4 py-2">Name</th>
                   <th className="border border-gray-300 px-4 py-2">Division</th>
-                  <th className="border border-gray-300 px-4 py-2">Department</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Department
+                  </th>
                   <th className="border border-gray-300 px-4 py-2">Position</th>
                   <th className="border border-gray-300 px-4 py-2 text-center w-28">
                     Action
@@ -394,8 +346,4 @@ export default function Page() {
       </div>
     </div>
   );
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes
