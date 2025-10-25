@@ -3,8 +3,10 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AddEmployee() {
+export default function AddParttimeEmployee() {
   const router = useRouter();
+  const [showModal, setShowModal] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
 
   const [employee, setEmployee] = useState({
     name: "",
@@ -28,14 +30,15 @@ export default function AddEmployee() {
     position: "",
     mcuHistory: "",
     trainingList: "",
-    allInSalary: "",
-    fixedAllowance: "",
-    basicSalary: "",
-    irregularAllowance: "",
+    hourlyRate: "",
+    totalHours: "",
+    allowance: "",
     bpjsEmployment: "",
     bpjsHealth: "",
     files: {} as Record<string, File | null>,
   });
+
+  const [fileNames, setFileNames] = useState<Record<string, string>>({});
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -50,12 +53,15 @@ export default function AddEmployee() {
         ...prev,
         files: { ...prev.files, [name]: files[0] },
       }));
+      setFileNames((prev) => ({
+        ...prev,
+        [name]: files[0].name,
+      }));
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Save to localStorage (files stored temporarily as filenames)
     const dataToSave = {
       ...employee,
       files: Object.fromEntries(
@@ -65,258 +71,148 @@ export default function AddEmployee() {
         ])
       ),
     };
-    localStorage.setItem("employeeData", JSON.stringify(dataToSave));
-    alert("Employee data has been successfully saved!");
-    router.push("/parttime-employee/detail/1");
+    localStorage.setItem("parttimeEmployeeData", JSON.stringify(dataToSave));
+    alert("Part-time employee data has been successfully saved!");
+    router.push("/parttime-employee"); // ⬅️ langsung ke halaman utama parttime
+  };
+
+  const handleClose = () => {
+    setFadeOut(true);
+    setTimeout(() => {
+      setShowModal(false);
+      router.push("/parttime-employee");
+    }, 300);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center py-10">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-10 rounded-lg shadow-md w-full max-w-5xl space-y-6"
-      >
-        <h1 className="text-2xl font-bold text-center mb-6">Add Employee</h1>
-
-        {/* === Biodata === */}
-        <section>
-          <h2 className="text-xl font-semibold border-b pb-1 mb-4">Biodata</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              name="name"
-              placeholder="Full Name"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="motherName"
-              placeholder="Biological Mother's Name"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="address"
-              placeholder="Address"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="religion"
-              placeholder="Religion"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="dob"
-              type="date"
-              placeholder="Date of Birth"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="age"
-              placeholder="Age"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="placeOfBirth"
-              placeholder="Place of Birth"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="maritalStatus"
-              placeholder="Marital Status"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="phone"
-              placeholder="Phone Number"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="identityNumber"
-              placeholder="Identity Number"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="lastEducation"
-              placeholder="Last Education"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-          </div>
-        </section>
-
-        {/* === Employment Information === */}
-        <section>
-          <h2 className="text-xl font-semibold border-b pb-1 mb-4">
-            Employment Information
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              name="nik"
-              placeholder="NIK"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="npwp"
-              placeholder="NPWP"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="accountNumber"
-              placeholder="Account Number"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="division"
-              placeholder="Division"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="dateJoin"
-              type="date"
-              placeholder="Date Joined"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="department"
-              placeholder="Department"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="dateEnd"
-              type="date"
-              placeholder="Date of End"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="position"
-              placeholder="Position"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="mcuHistory"
-              placeholder="MCU History"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="trainingList"
-              placeholder="Training List"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-          </div>
-        </section>
-
-        {/* === Payroll Information === */}
-        <section>
-          <h2 className="text-xl font-semibold border-b pb-1 mb-4">
-            Payroll Information
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              name="allInSalary"
-              placeholder="All-In Salary"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="fixedAllowance"
-              placeholder="Fixed Allowance"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="basicSalary"
-              placeholder="Basic Salary"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="irregularAllowance"
-              placeholder="Irregular Allowance"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-          </div>
-        </section>
-
-        {/* === Employee Benefit === */}
-        <section>
-          <h2 className="text-xl font-semibold border-b pb-1 mb-4">
-            Employee Benefit
-          </h2>
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              name="bpjsEmployment"
-              placeholder="BPJS Employment"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-            <input
-              name="bpjsHealth"
-              placeholder="BPJS Health"
-              onChange={handleChange}
-              className="border p-2 rounded"
-            />
-          </div>
-        </section>
-
-        {/* === Upload Documents === */}
-        <section>
-          <h2 className="font-bold text-lg mb-3 border-b border-gray-300 pb-1 text-black">
-            Upload Documents
-          </h2>
-          <div className="grid grid-cols-2 gap-4 text-black">
-            {[
-              ["photo", "Photo (Formal)"],
-              ["ktp", "Identity Card (KTP)"],
-              ["npwp", "Tax Number (NPWP)"],
-              ["bpjsKesehatan", "BPJS Health Insurance"],
-              ["bpjsKetenagakerjaan", "BPJS Employment Insurance"],
-              ["kartukeluarga", "Family Card (KK)"],
-              ["sertifikattraining", "Training Certificate"],
-              ["hasilmcu", "Medical Check Up Result"],
-              ["cv", "Curriculum Vitae (CV)"],
-              ["ijazah", "Diploma / Certificate"],
-            ].map(([name, label]) => (
-              <label key={name} className="flex flex-col">
-                <span className="mb-1 font-semibold">{label}</span>
-                <input
-                  type="file"
-                  name={name}
-                  onChange={handleFileChange}
-                  className="border p-2 rounded"
-                />
-              </label>
-            ))}
-          </div>
-        </section>
-
-        <div className="flex justify-end">
+    <div className="min-h-screen flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      {showModal && (
+        <div
+          className={`bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-lg p-8 relative transform transition-all duration-300 ${
+            fadeOut ? "opacity-0 scale-95" : "opacity-100 scale-100"
+          }`}
+        >
           <button
-            type="submit"
-            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+            onClick={handleClose}
+            className="absolute top-4 right-6 text-gray-600 hover:text-black text-2xl"
           >
-            Save
+            ✕
           </button>
+
+          <h1 className="text-2xl font-bold text-center mb-6">
+            Add Employee
+          </h1>
+
+          <form onSubmit={handleSubmit} className="space-y-6 text-sm">
+            {/* === Biodata === */}
+            <section>
+              <h2 className="text-xl font-semibold border-b pb-1 mb-4">
+                Biodata
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <input name="name" placeholder="Full Name" onChange={handleChange} className="border p-2 rounded" />
+                <input name="motherName" placeholder="Mother's Name" onChange={handleChange} className="border p-2 rounded" />
+                <input name="address" placeholder="Address" onChange={handleChange} className="border p-2 rounded" />
+                <input name="religion" placeholder="Religion" onChange={handleChange} className="border p-2 rounded" />
+                <input name="dob" type="date" placeholder="Date of Birth" onChange={handleChange} className="border p-2 rounded" />
+                <input name="age" placeholder="Age" onChange={handleChange} className="border p-2 rounded" />
+                <input name="placeOfBirth" placeholder="Place of Birth" onChange={handleChange} className="border p-2 rounded" />
+                <input name="maritalStatus" placeholder="Marital Status" onChange={handleChange} className="border p-2 rounded" />
+                <input name="phone" placeholder="Phone Number" onChange={handleChange} className="border p-2 rounded" />
+                <input name="identityNumber" placeholder="Identity Number" onChange={handleChange} className="border p-2 rounded" />
+                <input name="lastEducation" placeholder="Last Education" onChange={handleChange} className="border p-2 rounded" />
+              </div>
+            </section>
+
+            {/* === Employment Info === */}
+            <section>
+              <h2 className="text-xl font-semibold border-b pb-1 mb-4">
+                Employment Information
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <input name="nik" placeholder="NIK" onChange={handleChange} className="border p-2 rounded" />
+                <input name="npwp" placeholder="NPWP" onChange={handleChange} className="border p-2 rounded" />
+                <input name="accountNumber" placeholder="Account Number" onChange={handleChange} className="border p-2 rounded" />
+                <input name="division" placeholder="Division" onChange={handleChange} className="border p-2 rounded" />
+                <input name="dateJoin" type="date" placeholder="Date Joined" onChange={handleChange} className="border p-2 rounded" />
+                <input name="department" placeholder="Department" onChange={handleChange} className="border p-2 rounded" />
+                <input name="dateEnd" type="date" placeholder="Date of End" onChange={handleChange} className="border p-2 rounded" />
+                <input name="position" placeholder="Position" onChange={handleChange} className="border p-2 rounded" />
+                <input name="mcuHistory" placeholder="MCU History" onChange={handleChange} className="border p-2 rounded" />
+                <input name="trainingList" placeholder="Training List" onChange={handleChange} className="border p-2 rounded" />
+              </div>
+            </section>
+
+            {/* === Payroll Info === */}
+            <section>
+              <h2 className="text-xl font-semibold border-b pb-1 mb-4">
+                Payroll Information
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <input name="hourlyRate" placeholder="Hourly Rate" onChange={handleChange} className="border p-2 rounded" />
+                <input name="totalHours" placeholder="Total Hours Worked" onChange={handleChange} className="border p-2 rounded" />
+                <input name="allowance" placeholder="Allowance" onChange={handleChange} className="border p-2 rounded" />
+              </div>
+            </section>
+
+            {/* === Employee Benefit === */}
+            <section>
+              <h2 className="text-xl font-semibold border-b pb-1 mb-4">
+                Employee Benefit
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <input name="bpjsEmployment" placeholder="BPJS Employment" onChange={handleChange} className="border p-2 rounded" />
+                <input name="bpjsHealth" placeholder="BPJS Health" onChange={handleChange} className="border p-2 rounded" />
+              </div>
+            </section>
+
+            {/* === Upload Documents === */}
+            <section>
+              <h2 className="text-xl font-semibold border-b pb-1 mb-4">
+                Upload Documents
+              </h2>
+              <div className="grid grid-cols-2 gap-6">
+                {[
+                  ["photo", "Photo (Formal)"],
+                  ["ktp", "Identity Card (KTP)"],
+                  ["npwpFile", "Tax Number (NPWP)"],
+                  ["bpjsKesehatan", "BPJS Health Insurance"],
+                  ["bpjsKetenagakerjaan", "BPJS Employment Insurance"],
+                  ["kartukeluarga", "Family Card (KK)"],
+                  ["sertifikattraining", "Training Certificate"],
+                  ["hasilmcu", "Medical Check Up Result"],
+                  ["cv", "Curriculum Vitae (CV)"],
+                  ["ijazah", "Diploma / Certificate"],
+                ].map(([name, label]) => (
+                  <div key={name} className="flex flex-col">
+                    <label className="font-semibold mb-1 text-gray-800">
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      type="file"
+                      onChange={handleFileChange}
+                      className="block w-full text-sm text-gray-700 border border-gray-400 rounded-md cursor-pointer bg-gray-100 
+                        file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 
+                        file:text-sm file:font-semibold file:bg-gray-400 file:text-white hover:file:bg-gray-500"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <div className="flex justify-end pt-4">
+              <button
+                type="submit"
+                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+              >
+                Save
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      )}
     </div>
   );
 }
