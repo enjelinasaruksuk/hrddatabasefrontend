@@ -7,8 +7,6 @@ import {
   FiEdit,
   FiTrash2,
   FiChevronDown,
-  FiBriefcase,
-  FiUsers,
   FiLogOut,
   FiBell,
   FiUser,
@@ -216,7 +214,6 @@ export default function Page() {
                       setShowDepartment(false);
                     }}
                   >
-                    <FiBriefcase size={14} />
                     Division
                     <FiChevronDown
                       className={`transition-transform duration-200 ${
@@ -252,7 +249,6 @@ export default function Page() {
                       setShowDivision(false);
                     }}
                   >
-                    <FiUsers size={14} />
                     Department
                     <FiChevronDown
                       className={`transition-transform duration-200 ${

@@ -7,8 +7,6 @@ import {
   FiEdit,
   FiTrash2,
   FiChevronDown,
-  FiBriefcase,
-  FiUsers,
   FiLogOut,
   FiBell,
   FiUser,
@@ -21,18 +19,12 @@ export default function Page() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLogoutClick = () => {
-    setShowLogoutModal(true);
-  };
-
+  const handleLogoutClick = () => setShowLogoutModal(true);
   const handleLogoutConfirm = () => {
     setShowLogoutModal(false);
     router.push("/");
   };
-
-  const handleLogoutCancel = () => {
-    setShowLogoutModal(false);
-  };
+  const handleLogoutCancel = () => setShowLogoutModal(false);
 
   return (
     <div className="min-h-screen bg-gray-100 font-['Cambria']">
@@ -51,23 +43,16 @@ export default function Page() {
 
         <div className="flex items-center gap-2">
           <Link href="/reminder">
-            <button
-              aria-label="notifications"
-              className="p-2 rounded-full hover:bg-yellow-200 transition"
-            >
+            <button className="p-2 rounded-full hover:bg-yellow-200 transition">
               <FiBell size={20} />
             </button>
           </Link>
           <Link href="/profile">
-            <button
-              aria-label="profile"
-              className="p-2 rounded-full hover:bg-yellow-200 transition"
-            >
+            <button className="p-2 rounded-full hover:bg-yellow-200 transition">
               <FiUser size={20} />
             </button>
           </Link>
           <button
-            aria-label="logout"
             onClick={handleLogoutClick}
             className="ml-2 bg-red-600 text-white p-2 rounded-full shadow hover:bg-red-700 transition"
           >
@@ -76,7 +61,7 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Logout Confirmation Modal */}
+      {/* Logout Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
@@ -207,7 +192,7 @@ export default function Page() {
               </button>
 
               <div className="flex gap-3 relative">
-                {/* Division Button */}
+                {/* Division */}
                 <div className="relative">
                   <button
                     className="flex items-center gap-2 bg-gray-200 rounded-full px-3 py-1 text-sm hover:bg-gray-300 transition"
@@ -216,7 +201,6 @@ export default function Page() {
                       setShowDepartment(false);
                     }}
                   >
-                    <FiBriefcase size={14} />
                     Division
                     <FiChevronDown
                       className={`transition-transform duration-200 ${
@@ -243,7 +227,7 @@ export default function Page() {
                   )}
                 </div>
 
-                {/* Department Button */}
+                {/* Department */}
                 <div className="relative">
                   <button
                     className="flex items-center gap-2 bg-gray-200 rounded-full px-3 py-1 text-sm hover:bg-gray-300 transition"
@@ -252,7 +236,6 @@ export default function Page() {
                       setShowDivision(false);
                     }}
                   >
-                    <FiUsers size={14} />
                     Department
                     <FiChevronDown
                       className={`transition-transform duration-200 ${
@@ -286,8 +269,8 @@ export default function Page() {
             </button>
           </div>
 
-          {/* Table Section */}
-          <div className="overflow-x-auto">
+          {/* Table */}
+          <div className="overflow-x-auto mb-10">
             <table className="w-full border-collapse border border-gray-300 text-sm">
               <thead className="bg-gray-200 font-semibold">
                 <tr>
