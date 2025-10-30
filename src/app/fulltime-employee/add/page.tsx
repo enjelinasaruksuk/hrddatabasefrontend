@@ -42,7 +42,7 @@ export default function AddEmployee() {
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
   };
@@ -109,17 +109,36 @@ export default function AddEmployee() {
                 Biodata
               </h2>
               <div className="grid grid-cols-2 gap-4">
-                <input name="name" placeholder="Full Name" onChange={handleChange} className="border p-2 rounded" />
-                <input name="motherName" placeholder="Mother's Name" onChange={handleChange} className="border p-2 rounded" />
-                <input name="address" placeholder="Address" onChange={handleChange} className="border p-2 rounded" />
-                <input name="religion" placeholder="Religion" onChange={handleChange} className="border p-2 rounded" />
-                <input name="dob" type="date" placeholder="Date of Birth" onChange={handleChange} className="border p-2 rounded" />
-                <input name="age" placeholder="Age" onChange={handleChange} className="border p-2 rounded" />
-                <input name="placeOfBirth" placeholder="Place of Birth" onChange={handleChange} className="border p-2 rounded" />
-                <input name="maritalStatus" placeholder="Marital Status" onChange={handleChange} className="border p-2 rounded" />
-                <input name="phone" placeholder="Phone Number" onChange={handleChange} className="border p-2 rounded" />
-                <input name="identityNumber" placeholder="Identity Number" onChange={handleChange} className="border p-2 rounded" />
-                <input name="lastEducation" placeholder="Last Education" onChange={handleChange} className="border p-2 rounded" />
+                {[
+                  ["name", "Full Name"],
+                  ["motherName", "Mother's Name"],
+                  ["address", "Address"],
+                  ["religion", "Religion"],
+                  ["dob", "Date of Birth", "date"],
+                  ["age", "Age"],
+                  ["placeOfBirth", "Place of Birth"],
+                  ["maritalStatus", "Marital Status"],
+                  ["phone", "Phone Number"],
+                  ["identityNumber", "Identity Number"],
+                  ["lastEducation", "Last Education"],
+                ].map(([name, label, type = "text"]) => (
+                  <div key={name} className="flex flex-col">
+                    <label
+                      htmlFor={name}
+                      className="font-semibold text-gray-700 mb-1"
+                    >
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      type={type}
+                      placeholder={label}
+                      onChange={handleChange}
+                      className="border p-2 rounded"
+                    />
+                  </div>
+                ))}
               </div>
             </section>
 
@@ -129,16 +148,149 @@ export default function AddEmployee() {
                 Employment Information
               </h2>
               <div className="grid grid-cols-2 gap-4">
-                <input name="nik" placeholder="NIK" onChange={handleChange} className="border p-2 rounded" />
-                <input name="npwp" placeholder="NPWP" onChange={handleChange} className="border p-2 rounded" />
-                <input name="accountNumber" placeholder="Account Number" onChange={handleChange} className="border p-2 rounded" />
-                <input name="division" placeholder="Division" onChange={handleChange} className="border p-2 rounded" />
-                <input name="dateJoin" type="date" placeholder="Date Joined" onChange={handleChange} className="border p-2 rounded" />
-                <input name="department" placeholder="Department" onChange={handleChange} className="border p-2 rounded" />
-                <input name="dateEnd" type="date" placeholder="Date of End" onChange={handleChange} className="border p-2 rounded" />
-                <input name="position" placeholder="Position" onChange={handleChange} className="border p-2 rounded" />
-                <input name="mcuHistory" placeholder="MCU History" onChange={handleChange} className="border p-2 rounded" />
-                <input name="trainingList" placeholder="Training List" onChange={handleChange} className="border p-2 rounded" />
+                {/* === Normal Input === */}
+                <div className="flex flex-col">
+                  <label htmlFor="nik" className="font-semibold text-gray-700 mb-1">
+                    NIK
+                  </label>
+                  <input
+                    id="nik"
+                    name="nik"
+                    placeholder="NIK"
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="npwp" className="font-semibold text-gray-700 mb-1">
+                    NPWP
+                  </label>
+                  <input
+                    id="npwp"
+                    name="npwp"
+                    placeholder="NPWP"
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="accountNumber" className="font-semibold text-gray-700 mb-1">
+                    Account Number
+                  </label>
+                  <input
+                    id="accountNumber"
+                    name="accountNumber"
+                    placeholder="Account Number"
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  />
+                </div>
+
+                {/* === Dropdown Division === */}
+                <div className="flex flex-col">
+                  <label htmlFor="division" className="font-semibold text-gray-700 mb-1">
+                    Division
+                  </label>
+                  <select
+                    id="division"
+                    name="division"
+                    value={employee.division}
+                    onChange={handleChange}
+                    className="border p-2 rounded bg-white"
+                  >
+                    <option value="">Select Division</option>
+                    <option value="Overhead">Overhead</option>
+                    <option value="Manufacturing">Manufacturing</option>
+                    <option value="EPC 1">EPC 1</option>
+                    <option value="EPC 2">EPC 2</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="dateJoin" className="font-semibold text-gray-700 mb-1">
+                    Date Joined
+                  </label>
+                  <input
+                    id="dateJoin"
+                    name="dateJoin"
+                    type="date"
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  />
+                </div>
+
+                {/* === Dropdown Department === */}
+                <div className="flex flex-col">
+                  <label htmlFor="department" className="font-semibold text-gray-700 mb-1">
+                    Department
+                  </label>
+                  <select
+                    id="department"
+                    name="department"
+                    value={employee.department}
+                    onChange={handleChange}
+                    className="border p-2 rounded bg-white"
+                  >
+                    <option value="">Select Department</option>
+                    <option value="HR">Recruitment</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Business Development">Business Development</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="dateEnd" className="font-semibold text-gray-700 mb-1">
+                    Date of End
+                  </label>
+                  <input
+                    id="dateEnd"
+                    name="dateEnd"
+                    type="date"
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="position" className="font-semibold text-gray-700 mb-1">
+                    Position
+                  </label>
+                  <input
+                    id="position"
+                    name="position"
+                    placeholder="Position"
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="mcuHistory" className="font-semibold text-gray-700 mb-1">
+                    MCU History
+                  </label>
+                  <input
+                    id="mcuHistory"
+                    name="mcuHistory"
+                    placeholder="MCU History"
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  />
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="trainingList" className="font-semibold text-gray-700 mb-1">
+                    Training List
+                  </label>
+                  <input
+                    id="trainingList"
+                    name="trainingList"
+                    placeholder="Training List"
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  />
+                </div>
               </div>
             </section>
 
@@ -148,10 +300,28 @@ export default function AddEmployee() {
                 Payroll Information
               </h2>
               <div className="grid grid-cols-2 gap-4">
-                <input name="allInSalary" placeholder="All-In Salary" onChange={handleChange} className="border p-2 rounded" />
-                <input name="fixedAllowance" placeholder="Fixed Allowance" onChange={handleChange} className="border p-2 rounded" />
-                <input name="basicSalary" placeholder="Basic Salary" onChange={handleChange} className="border p-2 rounded" />
-                <input name="irregularAllowance" placeholder="Irregular Allowance" onChange={handleChange} className="border p-2 rounded" />
+                {[
+                  ["allInSalary", "All-In Salary"],
+                  ["fixedAllowance", "Fixed Allowance"],
+                  ["basicSalary", "Basic Salary"],
+                  ["irregularAllowance", "Irregular Allowance"],
+                ].map(([name, label]) => (
+                  <div key={name} className="flex flex-col">
+                    <label
+                      htmlFor={name}
+                      className="font-semibold text-gray-700 mb-1"
+                    >
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      placeholder={label}
+                      onChange={handleChange}
+                      className="border p-2 rounded"
+                    />
+                  </div>
+                ))}
               </div>
             </section>
 
@@ -161,8 +331,26 @@ export default function AddEmployee() {
                 Employee Benefit
               </h2>
               <div className="grid grid-cols-2 gap-4">
-                <input name="bpjsEmployment" placeholder="BPJS Employment" onChange={handleChange} className="border p-2 rounded" />
-                <input name="bpjsHealth" placeholder="BPJS Health" onChange={handleChange} className="border p-2 rounded" />
+                {[
+                  ["bpjsEmployment", "BPJS Employment"],
+                  ["bpjsHealth", "BPJS Health"],
+                ].map(([name, label]) => (
+                  <div key={name} className="flex flex-col">
+                    <label
+                      htmlFor={name}
+                      className="font-semibold text-gray-700 mb-1"
+                    >
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      placeholder={label}
+                      onChange={handleChange}
+                      className="border p-2 rounded"
+                    />
+                  </div>
+                ))}
               </div>
             </section>
 
@@ -186,7 +374,10 @@ export default function AddEmployee() {
                   ["ijazah", "Diploma / Certificate"],
                 ].map(([name, label]) => (
                   <div key={name} className="flex flex-col">
-                    <label className="font-semibold mb-1 text-gray-800">
+                    <label
+                      htmlFor={name}
+                      className="font-semibold mb-1 text-gray-800"
+                    >
                       {label}
                     </label>
                     <input

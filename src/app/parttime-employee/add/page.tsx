@@ -41,7 +41,7 @@ export default function AddParttimeEmployee() {
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
   };
@@ -73,7 +73,7 @@ export default function AddParttimeEmployee() {
     };
     localStorage.setItem("parttimeEmployeeData", JSON.stringify(dataToSave));
     alert("Part-time employee data has been successfully saved!");
-    router.push("/parttime-employee"); // ⬅️ langsung ke halaman utama parttime
+    router.push("/parttime-employee");
   };
 
   const handleClose = () => {
@@ -83,6 +83,10 @@ export default function AddParttimeEmployee() {
       router.push("/parttime-employee");
     }, 300);
   };
+
+  // Pilihan dropdown
+  const divisions = ["Overhead", "Manufacturing", "EPC 1", "EPC 2"];
+  const departments = ["HR", "Finance", "Business Development"];
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -110,48 +114,186 @@ export default function AddParttimeEmployee() {
                 Biodata
               </h2>
               <div className="grid grid-cols-2 gap-4">
-                <input name="name" placeholder="Full Name" onChange={handleChange} className="border p-2 rounded" />
-                <input name="motherName" placeholder="Mother's Name" onChange={handleChange} className="border p-2 rounded" />
-                <input name="address" placeholder="Address" onChange={handleChange} className="border p-2 rounded" />
-                <input name="religion" placeholder="Religion" onChange={handleChange} className="border p-2 rounded" />
-                <input name="dob" type="date" placeholder="Date of Birth" onChange={handleChange} className="border p-2 rounded" />
-                <input name="age" placeholder="Age" onChange={handleChange} className="border p-2 rounded" />
-                <input name="placeOfBirth" placeholder="Place of Birth" onChange={handleChange} className="border p-2 rounded" />
-                <input name="maritalStatus" placeholder="Marital Status" onChange={handleChange} className="border p-2 rounded" />
-                <input name="phone" placeholder="Phone Number" onChange={handleChange} className="border p-2 rounded" />
-                <input name="identityNumber" placeholder="Identity Number" onChange={handleChange} className="border p-2 rounded" />
-                <input name="lastEducation" placeholder="Last Education" onChange={handleChange} className="border p-2 rounded" />
+                {[
+                  ["name", "Full Name"],
+                  ["motherName", "Mother's Name"],
+                  ["address", "Address"],
+                  ["religion", "Religion"],
+                  ["dob", "Date of Birth", "date"],
+                  ["age", "Age"],
+                  ["placeOfBirth", "Place of Birth"],
+                  ["maritalStatus", "Marital Status"],
+                  ["phone", "Phone Number"],
+                  ["identityNumber", "Identity Number"],
+                  ["lastEducation", "Last Education"],
+                ].map(([name, label, type = "text"]) => (
+                  <div key={name} className="flex flex-col">
+                    <label
+                      htmlFor={name}
+                      className="font-semibold text-gray-700 mb-1"
+                    >
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      type={type}
+                      placeholder={label}
+                      onChange={handleChange}
+                      className="border p-2 rounded"
+                    />
+                  </div>
+                ))}
               </div>
             </section>
 
-            {/* === Employment Info === */}
+            {/* === Employment Information === */}
             <section>
               <h2 className="text-xl font-semibold border-b pb-1 mb-4">
                 Employment Information
               </h2>
               <div className="grid grid-cols-2 gap-4">
-                <input name="nik" placeholder="NIK" onChange={handleChange} className="border p-2 rounded" />
-                <input name="npwp" placeholder="NPWP" onChange={handleChange} className="border p-2 rounded" />
-                <input name="accountNumber" placeholder="Account Number" onChange={handleChange} className="border p-2 rounded" />
-                <input name="division" placeholder="Division" onChange={handleChange} className="border p-2 rounded" />
-                <input name="dateJoin" type="date" placeholder="Date Joined" onChange={handleChange} className="border p-2 rounded" />
-                <input name="department" placeholder="Department" onChange={handleChange} className="border p-2 rounded" />
-                <input name="dateEnd" type="date" placeholder="Date of End" onChange={handleChange} className="border p-2 rounded" />
-                <input name="position" placeholder="Position" onChange={handleChange} className="border p-2 rounded" />
-                <input name="mcuHistory" placeholder="MCU History" onChange={handleChange} className="border p-2 rounded" />
-                <input name="trainingList" placeholder="Training List" onChange={handleChange} className="border p-2 rounded" />
+                {/* NIK, NPWP, Account Number */}
+                {[
+                  ["nik", "NIK"],
+                  ["npwp", "NPWP"],
+                  ["accountNumber", "Account Number"],
+                ].map(([name, label]) => (
+                  <div key={name} className="flex flex-col">
+                    <label
+                      htmlFor={name}
+                      className="font-semibold text-gray-700 mb-1"
+                    >
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      type="text"
+                      placeholder={label}
+                      onChange={handleChange}
+                      className="border p-2 rounded"
+                    />
+                  </div>
+                ))}
+
+                {/* === Division dropdown === */}
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="division"
+                    className="font-semibold text-gray-700 mb-1"
+                  >
+                    Division
+                  </label>
+                  <select
+                    id="division"
+                    name="division"
+                    value={employee.division}
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  >
+                    <option value="">Select Division</option>
+                    {divisions.map((div) => (
+                      <option key={div} value={div}>
+                        {div}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="dateJoin"
+                    className="font-semibold text-gray-700 mb-1"
+                  >
+                    Date Joined
+                  </label>
+                  <input
+                    id="dateJoin"
+                    name="dateJoin"
+                    type="date"
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  />
+                </div>
+
+                {/* === Department dropdown === */}
+                <div className="flex flex-col">
+                  <label
+                    htmlFor="department"
+                    className="font-semibold text-gray-700 mb-1"
+                  >
+                    Department
+                  </label>
+                  <select
+                    id="department"
+                    name="department"
+                    value={employee.department}
+                    onChange={handleChange}
+                    className="border p-2 rounded"
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map((dept) => (
+                      <option key={dept} value={dept}>
+                        {dept}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {[
+                  ["dateEnd", "Date of End", "date"],
+                  ["position", "Position"],
+                  ["mcuHistory", "MCU History"],
+                  ["trainingList", "Training List"],
+                ].map(([name, label, type = "text"]) => (
+                  <div key={name} className="flex flex-col">
+                    <label
+                      htmlFor={name}
+                      className="font-semibold text-gray-700 mb-1"
+                    >
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      type={type}
+                      placeholder={label}
+                      onChange={handleChange}
+                      className="border p-2 rounded"
+                    />
+                  </div>
+                ))}
               </div>
             </section>
 
-            {/* === Payroll Info === */}
+            {/* === Payroll Information === */}
             <section>
               <h2 className="text-xl font-semibold border-b pb-1 mb-4">
                 Payroll Information
               </h2>
               <div className="grid grid-cols-2 gap-4">
-                <input name="hourlyRate" placeholder="Hourly Rate" onChange={handleChange} className="border p-2 rounded" />
-                <input name="totalHours" placeholder="Total Hours Worked" onChange={handleChange} className="border p-2 rounded" />
-                <input name="allowance" placeholder="Allowance" onChange={handleChange} className="border p-2 rounded" />
+                {[
+                  ["hourlyRate", "Hourly Rate"],
+                  ["totalHours", "Total Hours Worked"],
+                  ["allowance", "Allowance"],
+                ].map(([name, label]) => (
+                  <div key={name} className="flex flex-col">
+                    <label
+                      htmlFor={name}
+                      className="font-semibold text-gray-700 mb-1"
+                    >
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      placeholder={label}
+                      onChange={handleChange}
+                      className="border p-2 rounded"
+                    />
+                  </div>
+                ))}
               </div>
             </section>
 
@@ -161,8 +303,26 @@ export default function AddParttimeEmployee() {
                 Employee Benefit
               </h2>
               <div className="grid grid-cols-2 gap-4">
-                <input name="bpjsEmployment" placeholder="BPJS Employment" onChange={handleChange} className="border p-2 rounded" />
-                <input name="bpjsHealth" placeholder="BPJS Health" onChange={handleChange} className="border p-2 rounded" />
+                {[
+                  ["bpjsEmployment", "BPJS Employment"],
+                  ["bpjsHealth", "BPJS Health"],
+                ].map(([name, label]) => (
+                  <div key={name} className="flex flex-col">
+                    <label
+                      htmlFor={name}
+                      className="font-semibold text-gray-700 mb-1"
+                    >
+                      {label}
+                    </label>
+                    <input
+                      id={name}
+                      name={name}
+                      placeholder={label}
+                      onChange={handleChange}
+                      className="border p-2 rounded"
+                    />
+                  </div>
+                ))}
               </div>
             </section>
 
@@ -171,6 +331,7 @@ export default function AddParttimeEmployee() {
               <h2 className="text-xl font-semibold border-b pb-1 mb-4">
                 Upload Documents
               </h2>
+
               <div className="grid grid-cols-2 gap-6">
                 {[
                   ["photo", "Photo (Formal)"],
@@ -185,7 +346,10 @@ export default function AddParttimeEmployee() {
                   ["ijazah", "Diploma / Certificate"],
                 ].map(([name, label]) => (
                   <div key={name} className="flex flex-col">
-                    <label className="font-semibold mb-1 text-gray-800">
+                    <label
+                      htmlFor={name}
+                      className="font-semibold mb-1 text-gray-800"
+                    >
                       {label}
                     </label>
                     <input

@@ -1,203 +1,32 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
-import {
-  FiEdit,
-  FiTrash2,
-  FiChevronDown,
-  FiLogOut,
-  FiBell,
-  FiUser,
-} from "react-icons/fi";
+import Link from "next/link";
+import { FiEdit, FiTrash2, FiChevronDown } from "react-icons/fi";
+import Layout from "../components/Layout";
 
-export default function Page() {
+export default function FulltimeEmployeePage() {
   const [showDivision, setShowDivision] = useState(false);
   const [showDepartment, setShowDepartment] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const pathname = usePathname();
-  const router = useRouter();
-
-  const handleLogoutClick = () => {
-    setShowLogoutModal(true);
-  };
-
-  const handleLogoutConfirm = () => {
-    setShowLogoutModal(false);
-    router.push("/");
-  };
-
-  const handleLogoutCancel = () => {
-    setShowLogoutModal(false);
-  };
 
   return (
-    <div className="min-h-screen bg-gray-100 font-['Cambria']">
-      {/* Header */}
-      <header className="bg-yellow-300 border-b border-black h-16 flex items-center justify-between px-10 py-12 shadow-md">
-        <div className="flex items-center gap-6">
-          <img
-            src="/image/logo simkarin.png"
-            alt="Logo"
-            className="w-30 h-30 rounded-sm object-cover"
-          />
-          <h1 className="absolute left-1/2 transform -translate-x-1/2 text-2xl font-semibold text-gray-800">
-            Fulltime Employee
-          </h1>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Link href="/reminder">
-            <button
-              aria-label="notifications"
-              className="p-2 rounded-full hover:bg-yellow-200 transition"
-            >
-              <FiBell size={20} />
-            </button>
-          </Link>
-          <Link href="/profile">
-            <button
-              aria-label="profile"
-              className="p-2 rounded-full hover:bg-yellow-200 transition"
-            >
-              <FiUser size={20} />
-            </button>
-          </Link>
-          <button
-            aria-label="logout"
-            onClick={handleLogoutClick}
-            className="ml-2 bg-red-600 text-white p-2 rounded-full shadow hover:bg-red-700 transition"
-          >
-            <FiLogOut size={18} />
-          </button>
-        </div>
-      </header>
-
-      {/* Logout Confirmation Modal */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <FiLogOut className="text-red-600" size={24} />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-800">
-                Logout Confirmation
-              </h3>
-            </div>
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to logout? You will be redirected to the
-              home page.
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={handleLogoutCancel}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleLogoutConfirm}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition font-medium"
-              >
-                Yes, Logout
-              </button>
-            </div>
+    <Layout>
+      {/* Main konten */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+            👤
           </div>
+          <h2 className="text-xl font-semibold">Fulltime Employee</h2>
         </div>
-      )}
 
-      {/* Body */}
-      <div className="flex min-h-[calc(100vh-5rem)]">
-        {/* Sidebar */}
-        <aside className="w-64 bg-yellow-300 p-5 flex flex-col gap-2 font-[Cambria]">
-          <Link href="/dashboard">
-            <div
-              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
-                pathname === "/dashboard"
-                  ? "bg-yellow-200 shadow-sm"
-                  : "hover:bg-yellow-200"
-              }`}
-            >
-              <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
-                🏠
-              </div>
-              <span
-                className={`text-sm text-black ${
-                  pathname === "/dashboard" ? "font-semibold" : "font-medium"
-                }`}
-              >
-                Dashboard
-              </span>
-            </div>
-          </Link>
+        <input
+          placeholder="Search with name or NIK..."
+          className="border rounded-full px-4 py-2 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+        />
+      </div>
 
-          <Link href="/fulltime-employee">
-            <div
-              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
-                pathname?.startsWith("/fulltime-employee")
-                  ? "bg-yellow-200 shadow-sm"
-                  : "hover:bg-yellow-200"
-              }`}
-            >
-              <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
-                📁
-              </div>
-              <span
-                className={`text-sm text-black ${
-                  pathname?.startsWith("/fulltime-employee")
-                    ? "font-semibold"
-                    : "font-medium"
-                }`}
-              >
-                Fulltime Employee
-              </span>
-            </div>
-          </Link>
-
-          <Link href="/parttime-employee">
-            <div
-              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
-                pathname?.startsWith("/parttime-employee")
-                  ? "bg-yellow-200 shadow-sm"
-                  : "hover:bg-yellow-200"
-              }`}
-            >
-              <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
-                📁
-              </div>
-              <span
-                className={`text-sm text-black ${
-                  pathname?.startsWith("/parttime-employee")
-                    ? "font-semibold"
-                    : "font-medium"
-                }`}
-              >
-                Parttime Employee
-              </span>
-            </div>
-          </Link>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 bg-white p-8 relative">
-          {/* Header Section */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                👤
-              </div>
-              <h2 className="text-xl font-semibold">Fulltime Employee</h2>
-            </div>
-
-            <input
-              placeholder="Search with name or NIK..."
-              className="border rounded-full px-4 py-2 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-yellow-300"
-            />
-          </div>
-
-          {/* Action Buttons */}
+      {/* Action Buttons */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
@@ -205,7 +34,7 @@ export default function Page() {
               </button>
 
               <div className="flex gap-3 relative">
-                {/* Division Button */}
+                {/* Division */}
                 <div className="relative">
                   <button
                     className="flex items-center gap-2 bg-gray-200 rounded-full px-3 py-1 text-sm hover:bg-gray-300 transition"
@@ -240,7 +69,7 @@ export default function Page() {
                   )}
                 </div>
 
-                {/* Department Button */}
+                {/* Department */}
                 <div className="relative">
                   <button
                     className="flex items-center gap-2 bg-gray-200 rounded-full px-3 py-1 text-sm hover:bg-gray-300 transition"
@@ -282,8 +111,8 @@ export default function Page() {
             </button>
           </div>
 
-          {/* Table Section */}
-          <div className="overflow-x-auto">
+          {/* Table */}
+          <div className="overflow-x-auto mb-10">
             <table className="w-full border-collapse border border-gray-300 text-sm">
               <thead className="bg-gray-200 font-semibold">
                 <tr>
@@ -338,8 +167,6 @@ export default function Page() {
               </tbody>
             </table>
           </div>
-        </main>
-      </div>
-    </div>
+    </Layout>
   );
 }

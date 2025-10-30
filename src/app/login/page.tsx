@@ -29,11 +29,14 @@ export default function LoginPage() {
     // Reset error kalau semua valid
     setError("");
 
-    // Arahkan berdasarkan role
+    // Simpan role ke localStorage (buat akses halaman lain)
+    localStorage.setItem("userRole", role);
+
+    // Redirect ke dashboard sesuai role
     if (role === "hr") {
-      router.push("/dashboard");
+      router.push("/dashboard"); // Dashboard HR
     } else if (role === "manajemen-it") {
-      router.push("/dashboard-manajemen");
+      router.push("/manajemen-it/dashboard"); // Dashboard IT/Manajemen
     } else {
       setError("⚠️ Role tidak valid!");
     }
@@ -64,7 +67,7 @@ export default function LoginPage() {
           </div>
 
           <p className="text-sm text-gray-600 mb-6">
-            Login untuk mengakses sistem SIMKARIN.
+            Login to access the SIMKARIN system
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">

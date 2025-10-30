@@ -119,7 +119,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-[calc(100vh-5rem)]">
         {/* Sidebar */}
         <aside className="w-64 bg-yellow-300 p-5 flex flex-col gap-2 font-[Cambria]">
-          <Link href="/">
+          <Link href="/dashboard">
             <div
               className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
                 pathname === "/" || pathname === "/dashboard"
