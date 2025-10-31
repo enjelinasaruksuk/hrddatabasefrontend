@@ -34,7 +34,7 @@ export default function EmployeeDetail() {
   return (
     <div className="min-h-screen bg-gray-100 font-['Cambria']">
       {/* Header */}
-      <header className="bg-yellow-300 border-b border-black h-16 flex items-center justify-between px-10 py-12 shadow-md">
+      <header className="bg-gradient-to-b from-yellow-300 via-yellow-100 to-white border-b border-gray-300 h-16 flex items-center justify-between px-10 py-12 shadow-md">
         <div className="flex items-center gap-6">
           <img
             src="/image/logo simkarin.png"
@@ -46,7 +46,7 @@ export default function EmployeeDetail() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/reminder">
+          <Link href="/manajemen-it/reminder">
             <button
               aria-label="reminder"
               className="p-2 rounded-full hover:bg-yellow-200 transition"
@@ -109,13 +109,13 @@ export default function EmployeeDetail() {
       {/* Body */}
       <div className="flex min-h-[calc(100vh-5rem)]">
         {/* Sidebar */}
-        <aside className="w-64 bg-yellow-300 p-5 flex flex-col gap-2 font-[Cambria]">
-          <Link href="/dashboard">
+        <aside className="w-64 bg-gradient-to-b from-yellow-300 via-yellow-100 to-white p-5 flex flex-col gap-2 border-r border-gray-200 shadow-sm font-[Cambria]">
+          <Link href="/manajemen-it/dashboard">
             <div
               className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
                 pathname === "/dashboard"
-                  ? "bg-yellow-200 shadow-sm"
-                  : "hover:bg-yellow-200"
+                  ? "bg-yellow-100 shadow-sm"
+                  : "hover:bg-yellow-50"
               }`}
             >
               <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
@@ -133,12 +133,12 @@ export default function EmployeeDetail() {
             </div>
           </Link>
 
-          <Link href="/fulltime-employee">
+          <Link href="/manajemen-it/fulltime-employee">
             <div
               className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
                 pathname?.startsWith("/fulltime-employee")
-                  ? "bg-yellow-200 shadow-sm"
-                  : "hover:bg-yellow-200"
+                  ? "bg-yellow-100 shadow-sm"
+                  : "hover:bg-yellow-50"
               }`}
             >
               <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
@@ -156,12 +156,12 @@ export default function EmployeeDetail() {
             </div>
           </Link>
 
-          <Link href="/parttime-employee">
+          <Link href="/manajemen-it/parttime-employee">
             <div
               className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
                 pathname?.startsWith("/parttime-employee")
-                  ? "bg-yellow-200 shadow-sm"
-                  : "hover:bg-yellow-200"
+                  ? "bg-yellow-100 shadow-sm"
+                  : "hover:bg-yellow-50"
               }`}
             >
               <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
