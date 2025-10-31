@@ -54,7 +54,7 @@ export default function EmployeeDetail() {
               <FiBell size={20} />
             </button>
           </Link>
-          <Link href="/profile">
+          <Link href="/manajemen-it/profile">
             <button
               aria-label="profile"
               className="p-2 rounded-full hover:bg-yellow-200 transition"
