@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "HR Dashboard",
+  title: "HR & Manajemen IT Dashboard",
   description: "Sistem Informasi Karyawan Terintegrasi",
 };
 
