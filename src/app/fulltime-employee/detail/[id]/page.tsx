@@ -24,7 +24,7 @@ export default function EmployeeDetail() {
 
   const handleLogoutConfirm = () => {
     setShowLogoutModal(false);
-    router.push("/home");
+    router.push("/");
   };
 
   const handleLogoutCancel = () => {
