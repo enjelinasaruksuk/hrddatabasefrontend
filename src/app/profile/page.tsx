@@ -28,7 +28,6 @@ export default function ProfilePage() {
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    // ✅ Password validation
     if (password && password.length < 8) {
       setErrorMessage("❌ Password must be at least 8 characters long.");
       setSuccessMessage(null);
@@ -95,7 +94,6 @@ export default function ProfilePage() {
 
         <h1 className="text-3xl font-bold mb-8">My Profile</h1>
 
-        {/* ✅ Success & Error Message */}
         {successMessage && (
           <div className="mb-6 w-[80%] mx-auto bg-green-100 text-green-800 border border-green-400 rounded-md p-3 text-center font-medium animate-fadeIn">
             {successMessage}
@@ -118,19 +116,14 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-4 border-[#FDD835]">
+                  {/* ✅ SVG Placeholder Baru */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-12 w-12 text-gray-700"
-                    fill="none"
                     viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    fill="currentColor"
+                    className="h-12 w-12 text-gray-600"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5.121 17.804A10 10 0 1112 22a9.969 9.969 0 01-6.879-4.196z"
-                    />
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2c0 .6.6 1.2 1.2 1.2h16.8c.6 0 1.2-.6 1.2-1.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z" />
                   </svg>
                 </div>
               )}
@@ -191,7 +184,6 @@ export default function ProfilePage() {
               />
             </div>
 
-            {/* ✅ Edit & Save Button */}
             <div className="flex justify-end gap-3 mt-4">
               <button
                 type="button"

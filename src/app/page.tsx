@@ -29,7 +29,7 @@ export default function HomePage() {
         {/* Tombol login diarahkan ke halaman login */}
         <button
           onClick={() => router.push("/login")}
-          className="px-5 py-[4px] bg-[#34D534] rounded-full text-black text-base font-semibold hover:bg-[#2CC02D] active:bg-[#27A828] transition-colors duration-200"
+          className="px-5 py-[4px] bg-[#ffffff] rounded-full text-black text-base font-semibold hover:bg-[#FFF1A8] active:bg-[#FFF1A8] transition-colors duration-200"
         >
           Login
         </button>

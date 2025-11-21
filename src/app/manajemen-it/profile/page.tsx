@@ -52,7 +52,6 @@ export default function ProfilePage() {
       className="flex h-screen bg-[#fffbea]"
       style={{ fontFamily: "Cambria, serif" }}
     >
-      {/* ✅ Sidebar gradasi kuning ke putih */}
       <div
         className="w-1/5 flex flex-col items-center py-10"
         style={{
@@ -78,7 +77,6 @@ export default function ProfilePage() {
           Dashboard
         </button>
 
-        {/* ✅ Diperbaiki: arahkan ke /manajemen-it/profile */}
         <button
           onClick={() => router.push("/manajemen-it/profile")}
           className={`text-black font-semibold px-4 py-1 rounded-md transition-all duration-200 ${
@@ -123,19 +121,14 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-4 border-[#FDD835]">
+                  {/* ✅ Ikon Person Placeholder Baru */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-12 w-12 text-gray-700"
-                    fill="none"
                     viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    fill="currentColor"
+                    className="h-12 w-12 text-gray-600"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5.121 17.804A10 10 0 1112 22a9.969 9.969 0 01-6.879-4.196z"
-                    />
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2c0 .6.6 1.2 1.2 1.2h16.8c.6 0 1.2-.6 1.2-1.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z" />
                   </svg>
                 </div>
               )}
