@@ -10,35 +10,64 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("hr");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Tambahan: loading state
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validasi input kosong
     if (!username || !password) {
       setError("⚠️ Username and password are required!");
       return;
     }
 
-    // Validasi panjang password harus tepat 8 karakter
     if (password.length !== 8) {
       setError("⚠️ Password must be exactly 8 characters long!");
       return;
     }
 
-    // Reset error kalau semua valid
     setError("");
+    setLoading(true); // Set loading true
 
-    // Simpan role ke localStorage (buat akses halaman lain)
-    localStorage.setItem("userRole", role);
+    try {
+      // ✅ PERBAIKAN: URL yang benar
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          role,
+        }),
+      });
 
-    // Redirect ke dashboard sesuai role
-    if (role === "hr") {
-      router.push("/dashboard"); // Dashboard HR
-    } else if (role === "manajemen-it") {
-      router.push("/manajemen-it/dashboard"); // Dashboard IT/Manajemen
-    } else {
-      setError("⚠️ Role tidak valid!");
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(`⚠️ ${data.message}`);
+        setLoading(false);
+        return;
+      }
+
+      // Simpan token dan data user
+      localStorage.setItem("token", data.token); // ✅ Simpan token juga
+      localStorage.setItem("userRole", data.role);
+      localStorage.setItem("username", data.username);
+
+      // Arahkan ke halaman sesuai role
+      if (data.role === "hr") {
+        router.push("/dashboard");
+      } else if (data.role === "manajemen-it") {
+        router.push("/manajemen-it/dashboard");
+      } else {
+        setError("⚠️ Role tidak dikenal!");
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("Login error:", err); // Tambahan: log error
+      setError("⚠️ Server tidak merespon. Pastikan backend berjalan.");
+      setLoading(false);
     }
   };
 
@@ -78,6 +107,7 @@ export default function LoginPage() {
               onChange={(e) => setUsername(e.target.value)}
               className="w-full bg-yellow-50 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
+              disabled={loading}
             />
 
             <input
@@ -87,12 +117,14 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-yellow-50 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
               required
+              disabled={loading}
             />
 
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
               className="w-full bg-yellow-50 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              disabled={loading}
             >
               <option value="hr">HR</option>
               <option value="manajemen-it">Manajemen & IT</option>
@@ -107,9 +139,10 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full bg-[#FDD835] text-black font-semibold py-2 rounded-lg shadow-lg hover:bg-[#FBC02D] transition-transform transform hover:scale-105 font-[Cambria]"
+              disabled={loading}
+              className="w-full bg-[#FDD835] text-black font-semibold py-2 rounded-lg shadow-lg hover:bg-[#FBC02D] transition-transform transform hover:scale-105 font-[Cambria] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              LOGIN
+              {loading ? "LOADING..." : "LOGIN"}
             </button>
           </form>
         </div>
