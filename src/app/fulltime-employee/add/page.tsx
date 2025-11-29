@@ -3,10 +3,11 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AddEmployee() {
+export default function AddFulltimeEmployee() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [employee, setEmployee] = useState({
     name: "",
@@ -30,21 +31,91 @@ export default function AddEmployee() {
     position: "",
     mcuHistory: "",
     trainingList: "",
-    allInSalary: "",
+    salaryAllIn: "",
     fixedAllowance: "",
-    basicSalary: "",
-    irregularAllowance: "",
+    salaryBasic: "",
+    nonFixedAllowance: "",
     bpjsEmployment: "",
     bpjsHealth: "",
     files: {} as Record<string, File | null>,
   });
 
-  const [fileNames, setFileNames] = useState<Record<string, string>>({});
+  type Training = {
+    detail: string;
+    trainingDate: string;
+    expiryDate: string;
+  };
 
+  const numericRules: Record<string, number> = {
+    npwp: 15,
+    bpjsHealth: 13,
+    bpjsEmployment: 11,
+    identityNumber: 16,
+  };
+
+  const [fileNames, setFileNames] = useState<Record<string, string>>({});
+  const [training, setTraining] = useState<Training>({
+    detail: "",
+    trainingDate: "",
+    expiryDate: "",
+  });
+
+  // ADD: Format Rupiah Function
+  const formatRupiah = (value: string) => {
+    const numberString = value.replace(/[^0-9]/g, "");
+    return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  // EDIT: handleChange
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
-    setEmployee({ ...employee, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // --- Logic umur otomatis ---
+    if (name === "dob") {
+      const birthDate = new Date(value);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      setEmployee({
+        ...employee,
+        dob: value,
+        age: age.toString(),
+      });
+
+      return; // stop eksekusi lebih lanjut untuk dob
+    }
+
+    // === Handle change (NPWP, BPJS dan NIK KTP) ===
+    if (numericRules[name]) {
+      const onlyNumbers = value.replace(/[^0-9]/g, "");
+      setEmployee({ ...employee, [name]: onlyNumbers });
+      return;
+    }
+
+    // Field payroll yang harus format rupiah
+    const salaryFields = [
+      "salaryAllIn",
+      "fixedAllowance",
+      "salaryBasic",
+      "nonFixedAllowance",
+    ];
+
+    if (salaryFields.includes(name)) {
+      return setEmployee({
+        ...employee,
+        [name]: formatRupiah(value),
+      });
+    }
+
+    setEmployee({ ...employee, [name]: value });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +125,7 @@ export default function AddEmployee() {
         ...prev,
         files: { ...prev.files, [name]: files[0] },
       }));
+
       setFileNames((prev) => ({
         ...prev,
         [name]: files[0].name,
@@ -61,20 +133,150 @@ export default function AddEmployee() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const dataToSave = {
-      ...employee,
-      files: Object.fromEntries(
-        Object.entries(employee.files).map(([key, file]) => [
-          key,
-          file ? file.name : null,
-        ])
-      ),
-    };
-    localStorage.setItem("employeeData", JSON.stringify(dataToSave));
-    alert("Employee data has been successfully saved!");
-    router.push("/fulltime-employee");
+
+    let hasError = false;
+    const newErrors: Record<string, string> = {};
+
+    // List field yang wajib diisi
+    const requiredFields = [
+      "name",
+      "motherName",
+      "address",
+      "religion",
+      "dob",
+      "placeOfBirth",
+      "maritalStatus",
+      "phone",
+      "identityNumber",
+      "lastEducation",
+      "nik",
+      "npwp",
+      "accountNumber",
+      "division",
+      "dateJoin",
+      "dateEnd",
+      "department",
+      "position",
+      "salaryAllIn",
+      "fixedAllowance",
+      "salaryBasic",
+      "nonFixedAllowance",
+      "bpjsEmployment",
+      "bpjsHealth"
+    ];
+
+    // Cek setiap field wajib
+    requiredFields.forEach((field) => {
+      if (!(employee as any)[field]) {
+        newErrors[field] = "*This field is required";
+        hasError = true;
+      }
+    });
+
+    // Validasi training juga
+    if (!training.detail) {
+      newErrors["trainingDetail"] = "*Training detail is required";
+      hasError = true;
+    }
+    if (!training.trainingDate) {
+      newErrors["trainingDate"] = "*Training date is required";
+      hasError = true;
+    }
+    if (!training.expiryDate) {
+      newErrors["expiryDate"] = "*Expiry date is required";
+      hasError = true;
+    }
+
+    // === File wajib ===
+    const requiredFiles = [
+      "photo",
+      "ktp",
+      "npwpFile",
+      "bpjsKesehatan",
+      "bpjsKetenagakerjaan",
+      "kartukeluarga",
+      "sertifikattraining",
+      "hasilmcu",
+      "cvkaryawan",
+      "degreeCertificate"
+    ];
+
+    requiredFiles.forEach((fileField) => {
+      if (!employee.files[fileField]) {
+        newErrors[fileField] = "*This file is required";
+        hasError = true;
+      }
+    });
+
+    // Validasi numeric fields
+    for (const field in numericRules) {
+      const requiredLength = numericRules[field];
+      const currentValue = (employee as any)[field];
+      if (!currentValue || currentValue.length < requiredLength) {
+        newErrors[field] = `*Minimum ${requiredLength} digits`;
+        hasError = true;
+      }
+    }
+
+    setErrors(newErrors);
+
+    if (hasError) {
+      alert("Please fill all required fields correctly.");
+      return; // stop submit
+    }
+    // --- Kirim data pakai FormData untuk file ---
+    const formData = new FormData();
+
+    // Append text fields
+    formData.append("nik", employee.nik);
+    formData.append("name", employee.name);
+    formData.append("birth_place", employee.placeOfBirth);
+    formData.append("birth_date", employee.dob || "");
+    formData.append("age", employee.age || "");
+    formData.append("mother_name", employee.motherName);
+    formData.append("religion", employee.religion);
+    formData.append("address", employee.address);
+    formData.append("phone_number", employee.phone);
+    formData.append("marital_status", employee.maritalStatus);
+    formData.append("last_education", employee.lastEducation);
+    formData.append("bank_account", employee.accountNumber);
+    formData.append("identity_number", employee.identityNumber);
+    formData.append("tax_number", employee.npwp);
+    formData.append("department_id", employee.department || "");
+    formData.append("position", employee.position);
+    formData.append("employment_type", "Fulltime");
+    formData.append("training_detail", training.detail);
+    formData.append("training_date", training.trainingDate || "");
+    formData.append("expiry_date", training.expiryDate || "");
+
+    // Append files
+    requiredFiles.forEach((fileField) => {
+      const file = employee.files[fileField];
+      if (file) formData.append(fileField, file);
+    });
+
+    try {
+      const res = await fetch("http://localhost:5000/api/employees", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("failed to save data to server:", data);
+        alert("Failed to save data to the server. See the console for error details.");
+        return;
+      }
+
+      alert("successfully added to the database!");
+      router.push("/fulltime-employee");
+
+    } catch (error) {
+      alert("unable to connect to backend server!");
+    }
   };
 
   const handleClose = () => {
@@ -89,9 +291,8 @@ export default function AddEmployee() {
     <div className="min-h-screen flex items-center justify-center bg-black/40 backdrop-blur-sm">
       {showModal && (
         <div
-          className={`bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-lg p-8 relative transform transition-all duration-300 ${
-            fadeOut ? "opacity-0 scale-95" : "opacity-100 scale-100"
-          }`}
+          className={`bg-white w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-lg p-8 relative transform transition-all duration-300 ${fadeOut ? "opacity-0 scale-95" : "opacity-100 scale-100"
+            }`}
         >
           <button
             onClick={handleClose}
@@ -103,42 +304,93 @@ export default function AddEmployee() {
           <h1 className="text-2xl font-bold text-center mb-6">Add Employee</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6 text-sm">
+
             {/* === Biodata === */}
             <section>
               <h2 className="text-xl font-semibold border-b pb-1 mb-4">
                 Biodata
               </h2>
+
               <div className="grid grid-cols-2 gap-4">
                 {[
                   ["name", "Full Name"],
                   ["motherName", "Mother's Name"],
-                  ["address", "Address"],
+                  ["address", "Address (RT/RW, Sub-districts and Villages)"],
                   ["religion", "Religion"],
                   ["dob", "Date of Birth", "date"],
                   ["age", "Age"],
                   ["placeOfBirth", "Place of Birth"],
-                  ["maritalStatus", "Marital Status"],
+                  ["maritalStatus", "Marital Status", "select"],
                   ["phone", "Phone Number"],
-                  ["identityNumber", "Identity Number"],
-                  ["lastEducation", "Last Education"],
+                  ["identityNumber", "Identity Number (NIK KTP)"],
+                  ["lastEducation", "Last Education (Major/Jurusan)"]
                 ].map(([name, label, type = "text"]) => (
                   <div key={name} className="flex flex-col">
-                    <label
-                      htmlFor={name}
-                      className="font-semibold text-gray-700 mb-1"
-                    >
-                      {label}
-                    </label>
-                    <input
-                      id={name}
-                      name={name}
-                      type={type}
-                      placeholder={label}
-                      onChange={handleChange}
-                      className="border p-2 rounded"
-                    />
+                    <label className="font-semibold text-gray-700 mb-1">{label}</label>
+
+                    {type === "select" ? (
+                      <select
+                        name={name}
+                        value={employee.maritalStatus}
+                        onChange={handleChange}
+                        className="border p-2 rounded bg-white"
+                      >
+                        <option value="" disabled>Select Status</option>
+                        <option value="TK">TK</option>
+                        <option value="K/01">K/01</option>
+                        <option value="K/02">K/02</option>
+                      </select>
+                    ) : (
+                      <input
+                        name={name}
+                        type={name === "age" ? "text" : type} // read-only untuk age
+                        placeholder={label}
+                        value={(employee as any)[name]}
+                        onChange={handleChange}
+                        className={`border p-2 rounded ${name === "age" ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                        readOnly={name === "age"}
+                      />
+                    )}
+
+                    {errors[name] && (
+                      <span className="text-red-600 text-sm mt-1">{errors[name]}</span>
+                    )}
                   </div>
                 ))}
+                <div className="col-span-2">
+                  <div className="flex gap-2 mb-2 items-end">
+                    <div className="flex flex-col w-1/3">
+                      <label className="font-semibold text-gray-700 mb-1">Training List</label>
+                      <input
+                        type="text"
+                        placeholder="Training Detail"
+                        value={training.detail}
+                        onChange={(e) => setTraining({ ...training, detail: e.target.value })}
+                        className="border p-2 rounded"
+                      />
+                    </div>
+
+                    <div className="flex flex-col w-1/3">
+                      <label className="font-semibold text-gray-700 mb-1">Training Date</label>
+                      <input
+                        type="date"
+                        value={training.trainingDate}
+                        onChange={(e) => setTraining({ ...training, trainingDate: e.target.value })}
+                        className="border p-2 rounded"
+                      />
+                    </div>
+
+                    <div className="flex flex-col w-1/3">
+                      <label className="font-semibold text-gray-700 mb-1">Expiry Date</label>
+                      <input
+                        type="date"
+                        value={training.expiryDate}
+                        onChange={(e) => setTraining({ ...training, expiryDate: e.target.value })}
+                        className="border p-2 rounded"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -147,60 +399,64 @@ export default function AddEmployee() {
               <h2 className="text-xl font-semibold border-b pb-1 mb-4">
                 Employment Information
               </h2>
+
               <div className="grid grid-cols-2 gap-4">
-                {/* === Normal Input === */}
+                {[
+                  ["nik", "NIK (Employee Identification Number)"],
+                  ["npwp", "NPWP"],
+                  ["accountNumber", "Account Number"],
+                  ["position", "Position"],
+                ].map(([name, label]) => (
+                  <div key={name} className="flex flex-col">
+                    <label className="font-semibold text-gray-700 mb-1">
+                      {label}
+                    </label>
+                    <input
+                      name={name}
+                      placeholder={label}
+                      value={(employee as any)[name]}
+                      onChange={handleChange}
+                      className="border p-2 rounded"
+                    />
+                    {errors[name] && (
+                      <span className="text-red-600 text-sm mt-1">
+                        {errors[name]}
+                      </span>
+                    )}
+
+                  </div>
+                ))}
+
+                {/* MCU History sebagai tanggal */}
                 <div className="flex flex-col">
-                  <label htmlFor="nik" className="font-semibold text-gray-700 mb-1">
-                    NIK
+                  <label className="font-semibold text-gray-700 mb-1">
+                    MCU History
                   </label>
                   <input
-                    id="nik"
-                    name="nik"
-                    placeholder="NIK"
+                    name="mcuHistory"
+                    type="date"
                     onChange={handleChange}
                     className="border p-2 rounded"
                   />
+                  {errors["mcuHistory"] && (
+                    <span className="text-red-600 text-sm mt-1">
+                      {errors["mcuHistory"]}
+                    </span>
+                  )}
                 </div>
 
+                {/* Dropdown Division */}
                 <div className="flex flex-col">
-                  <label htmlFor="npwp" className="font-semibold text-gray-700 mb-1">
-                    NPWP
-                  </label>
-                  <input
-                    id="npwp"
-                    name="npwp"
-                    placeholder="NPWP"
-                    onChange={handleChange}
-                    className="border p-2 rounded"
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label htmlFor="accountNumber" className="font-semibold text-gray-700 mb-1">
-                    Account Number
-                  </label>
-                  <input
-                    id="accountNumber"
-                    name="accountNumber"
-                    placeholder="Account Number"
-                    onChange={handleChange}
-                    className="border p-2 rounded"
-                  />
-                </div>
-
-                {/* === Dropdown Division === */}
-                <div className="flex flex-col">
-                  <label htmlFor="division" className="font-semibold text-gray-700 mb-1">
+                  <label className="font-semibold text-gray-700 mb-1">
                     Division
                   </label>
                   <select
-                    id="division"
                     name="division"
                     value={employee.division}
                     onChange={handleChange}
                     className="border p-2 rounded bg-white"
                   >
-                    <option value="">Select Division</option>
+                    <option value="" disabled>Select Division</option>
                     <option value="Overhead">Overhead</option>
                     <option value="Manufacturing">Manufacturing</option>
                     <option value="EPC 1">EPC 1</option>
@@ -208,118 +464,96 @@ export default function AddEmployee() {
                   </select>
                 </div>
 
+                {/* Date Joined */}
                 <div className="flex flex-col">
-                  <label htmlFor="dateJoin" className="font-semibold text-gray-700 mb-1">
-                    Date Joined
+                  <label className="font-semibold text-gray-700 mb-1">
+                    Date of Joined
                   </label>
                   <input
-                    id="dateJoin"
                     name="dateJoin"
                     type="date"
                     onChange={handleChange}
                     className="border p-2 rounded"
                   />
+                  {errors["dateJoin"] && (
+                    <span className="text-red-600 text-sm mt-1">
+                      {errors["dateJoin"]}
+                    </span>
+                  )}
+
                 </div>
 
-                {/* === Dropdown Department === */}
+                {/* Dropdown Department */}
                 <div className="flex flex-col">
-                  <label htmlFor="department" className="font-semibold text-gray-700 mb-1">
+                  <label className="font-semibold text-gray-700 mb-1">
                     Department
                   </label>
                   <select
-                    id="department"
                     name="department"
                     value={employee.department}
                     onChange={handleChange}
                     className="border p-2 rounded bg-white"
                   >
-                    <option value="">Select Department</option>
-                    <option value="HR">Recruitment</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Business Development">Business Development</option>
+                    <option value="" disabled>Select Department</option>
+                    <option value="1">HRD</option>
+                    <option value="2">Finance</option>
+                    <option value="3">Business Development</option>
                   </select>
                 </div>
 
+                {/* Date End */}
                 <div className="flex flex-col">
-                  <label htmlFor="dateEnd" className="font-semibold text-gray-700 mb-1">
+                  <label className="font-semibold text-gray-700 mb-1">
                     Date of End
                   </label>
                   <input
-                    id="dateEnd"
                     name="dateEnd"
                     type="date"
                     onChange={handleChange}
                     className="border p-2 rounded"
                   />
-                </div>
+                  {errors["dateEnd"] && (
+                    <span className="text-red-600 text-sm mt-1">
+                      {errors["dateEnd"]}
+                    </span>
+                  )}
 
-                <div className="flex flex-col">
-                  <label htmlFor="position" className="font-semibold text-gray-700 mb-1">
-                    Position
-                  </label>
-                  <input
-                    id="position"
-                    name="position"
-                    placeholder="Position"
-                    onChange={handleChange}
-                    className="border p-2 rounded"
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label htmlFor="mcuHistory" className="font-semibold text-gray-700 mb-1">
-                    MCU History
-                  </label>
-                  <input
-                    id="mcuHistory"
-                    name="mcuHistory"
-                    placeholder="MCU History"
-                    onChange={handleChange}
-                    className="border p-2 rounded"
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label htmlFor="trainingList" className="font-semibold text-gray-700 mb-1">
-                    Training List
-                  </label>
-                  <input
-                    id="trainingList"
-                    name="trainingList"
-                    placeholder="Training List"
-                    onChange={handleChange}
-                    className="border p-2 rounded"
-                  />
                 </div>
               </div>
             </section>
 
-            {/* === Payroll Information === */}
+            {/* === Payroll === */}
             <section>
               <h2 className="text-xl font-semibold border-b pb-1 mb-4">
                 Payroll Information
               </h2>
+
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  ["allInSalary", "All-In Salary"],
+                  ["salaryAllIn", "Salary All In"],
                   ["fixedAllowance", "Fixed Allowance"],
-                  ["basicSalary", "Basic Salary"],
-                  ["irregularAllowance", "Irregular Allowance"],
+                  ["salaryBasic", "Salary Basic"],
+                  ["nonFixedAllowance", "Non Fixed Allowance"],
                 ].map(([name, label]) => (
                   <div key={name} className="flex flex-col">
-                    <label
-                      htmlFor={name}
-                      className="font-semibold text-gray-700 mb-1"
-                    >
+                    <label className="font-semibold text-gray-700 mb-1">
                       {label}
                     </label>
+
                     <input
-                      id={name}
                       name={name}
                       placeholder={label}
+                      value={(employee as any)[name]}
                       onChange={handleChange}
                       className="border p-2 rounded"
                     />
+
+                    {/* PESAN ERROR FORMAT RUPIAH */}
+                    {errors[name] && (
+                      <span className="text-red-600 text-sm mt-1">
+                        {errors[name]}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -330,25 +564,29 @@ export default function AddEmployee() {
               <h2 className="text-xl font-semibold border-b pb-1 mb-4">
                 Employee Benefit
               </h2>
+
               <div className="grid grid-cols-2 gap-4">
                 {[
                   ["bpjsEmployment", "BPJS Employment"],
                   ["bpjsHealth", "BPJS Health"],
                 ].map(([name, label]) => (
                   <div key={name} className="flex flex-col">
-                    <label
-                      htmlFor={name}
-                      className="font-semibold text-gray-700 mb-1"
-                    >
+                    <label className="font-semibold text-gray-700 mb-1">
                       {label}
                     </label>
                     <input
-                      id={name}
                       name={name}
                       placeholder={label}
+                      value={(employee as any)[name]}
                       onChange={handleChange}
                       className="border p-2 rounded"
                     />
+                    {errors[name] && (
+                      <span className="text-red-600 text-sm mt-1">
+                        {errors[name]}
+                      </span>
+                    )}
+
                   </div>
                 ))}
               </div>
@@ -370,25 +608,26 @@ export default function AddEmployee() {
                   ["kartukeluarga", "Family Card (KK)"],
                   ["sertifikattraining", "Training Certificate"],
                   ["hasilmcu", "Medical Check Up Result"],
-                  ["cv", "Curriculum Vitae (CV)"],
-                  ["ijazah", "Diploma / Certificate"],
+                  ["cvkaryawan", "CV / Resume"],
+                  ["degreeCertificate", "Degree Certificate / Ijazah"]
                 ].map(([name, label]) => (
                   <div key={name} className="flex flex-col">
-                    <label
-                      htmlFor={name}
-                      className="font-semibold mb-1 text-gray-800"
-                    >
+                    <label className="font-semibold mb-1 text-gray-800">
                       {label}
                     </label>
                     <input
-                      id={name}
-                      name={name}
                       type="file"
+                      name={name}
                       onChange={handleFileChange}
                       className="block w-full text-sm text-gray-700 border border-gray-400 rounded-md cursor-pointer bg-gray-100 
-                        file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 
-                        file:text-sm file:font-semibold file:bg-gray-400 file:text-white hover:file:bg-gray-500"
+                      file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 
+                      file:text-sm file:font-semibold file:bg-gray-400 file:text-white hover:file:bg-gray-500"
                     />
+                    {errors[name] && (
+                      <span className="text-red-600 text-sm mt-1">
+                        {errors[name]}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
