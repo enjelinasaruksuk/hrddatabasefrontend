@@ -80,12 +80,6 @@ export default function ManajemenITParttimeEmployeePage() {
     setShowDepartment(false);
   };
 
-  const clearFilters = () => {
-    setSelectedDivision("");
-    setSelectedDepartment("");
-    setSearchKeyword("");
-  };
-
   return (
     <Layout>
       <div className="flex items-center justify-between mb-4">
@@ -107,6 +101,7 @@ export default function ManajemenITParttimeEmployeePage() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="flex gap-3 relative">
+            {/* DIVISION DROPDOWN */}
             <div className="relative">
               <button
                 className="flex items-center gap-2 bg-gray-200 rounded-full px-3 py-1 text-sm hover:bg-gray-300 transition"
@@ -117,19 +112,17 @@ export default function ManajemenITParttimeEmployeePage() {
               >
                 {selectedDivision || "Division"}
                 <FiChevronDown
-                  className={`transition-transform duration-200 ${
-                    showDivision ? "rotate-180" : ""
-                  }`}
+                  className={`transition-transform duration-200 ${showDivision ? "rotate-180" : ""}`}
                 />
               </button>
 
               {showDivision && (
                 <div className="absolute left-0 mt-2 w-44 bg-white border border-gray-300 rounded-lg shadow-lg z-10 animate-fadeIn">
                   <ul className="text-sm text-gray-700">
-                    {["Overhead", "Manufacturing", "EPC 1", "EPC 2"].map((item) => (
+                    {["All Division", "Overhead", "Manufacturing", "EPC 1", "EPC 2"].map((item) => (
                       <li
                         key={item}
-                        onClick={() => handleDivisionSelect(item)}
+                        onClick={() => handleDivisionSelect(item === "All Division" ? "" : item)}
                         className="px-4 py-2 hover:bg-yellow-100 cursor-pointer"
                       >
                         {item}
@@ -140,6 +133,7 @@ export default function ManajemenITParttimeEmployeePage() {
               )}
             </div>
 
+            {/* DEPARTMENT DROPDOWN */}
             <div className="relative">
               <button
                 className="flex items-center gap-2 bg-gray-200 rounded-full px-3 py-1 text-sm hover:bg-gray-300 transition"
@@ -150,19 +144,17 @@ export default function ManajemenITParttimeEmployeePage() {
               >
                 {selectedDepartment || "Department"}
                 <FiChevronDown
-                  className={`transition-transform duration-200 ${
-                    showDepartment ? "rotate-180" : ""
-                  }`}
+                  className={`transition-transform duration-200 ${showDepartment ? "rotate-180" : ""}`}
                 />
               </button>
 
               {showDepartment && (
                 <div className="absolute left-0 mt-2 w-44 bg-white border border-gray-300 rounded-lg shadow-lg z-10 animate-fadeIn">
                   <ul className="text-sm text-gray-700">
-                    {["HRD", "Finance", "Business Development"].map((item) => (
+                    {["All Department", "HRD", "Finance", "Business Development"].map((item) => (
                       <li
                         key={item}
-                        onClick={() => handleDepartmentSelect(item)}
+                        onClick={() => handleDepartmentSelect(item === "All Department" ? "" : item)}
                         className="px-4 py-2 hover:bg-yellow-100 cursor-pointer"
                       >
                         {item}
@@ -172,15 +164,6 @@ export default function ManajemenITParttimeEmployeePage() {
                 </div>
               )}
             </div>
-
-            {(selectedDivision || selectedDepartment || searchKeyword) && (
-              <button
-                onClick={clearFilters}
-                className="bg-red-500 text-white rounded-full px-3 py-1 text-sm hover:bg-red-600 transition"
-              >
-                Clear Filters
-              </button>
-            )}
           </div>
         </div>
 
@@ -215,8 +198,8 @@ export default function ManajemenITParttimeEmployeePage() {
               <tbody>
                 {filteredEmployees.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="border border-gray-300 px-4 py-8 text-center text-gray-500">
-                      No employees found
+                    <td colSpan={8} className="text-center py-4 text-gray-500 italic">
+                      No data available
                     </td>
                   </tr>
                 ) : (
