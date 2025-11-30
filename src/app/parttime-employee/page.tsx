@@ -26,12 +26,16 @@ export default function FulltimeEmployeePage() {
   const [showDivision, setShowDivision] = useState(false);
   const [showDepartment, setShowDepartment] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [divisionFilter, setDivisionFilter] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("");
 
   // FETCH DATA
   useEffect(() => {
+    setLoading(true);
+
     const params = new URLSearchParams();
     if (search.trim() !== "") params.append("keyword", search);
     if (divisionFilter) params.append("division", divisionFilter);
@@ -41,8 +45,15 @@ export default function FulltimeEmployeePage() {
 
     fetch(url)
       .then(res => res.json())
-      .then(data => setEmployees(Array.isArray(data) ? data : []))
-      .catch(() => setEmployees([]));
+      .then(data => {
+        const arr = Array.isArray(data) ? data : [];
+        setEmployees(arr);
+        if (search === "" && divisionFilter === "" && departmentFilter === "") {
+          setFilteredEmployees(arr); // total original
+        }
+      })
+      .catch(() => setEmployees([]))
+      .finally(() => setLoading(false));
   }, [search, divisionFilter, departmentFilter]);
 
   // DELETE HANDLER
@@ -147,6 +158,14 @@ export default function FulltimeEmployeePage() {
         </div>
         <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">Excel</button>
       </div>
+
+      {loading ? (
+        <div className="text-center py-10 text-gray-600">Loading employees...</div>
+      ) : (
+        <div className="mb-2 text-sm text-gray-600">
+          Showing {employees.length} of {filteredEmployees.length || employees.length} employees
+        </div>
+      )}
 
       {/* Table */}
       <table className="w-full border-collapse border border-gray-300 text-sm">
