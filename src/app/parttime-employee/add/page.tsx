@@ -189,7 +189,6 @@ export default function AddParttimeEmployee() {
       hasError = true;
     }
 
-
     // === File wajib ===
     const requiredFiles = [
       "photo",
@@ -227,11 +226,11 @@ export default function AddParttimeEmployee() {
       alert("Please fill all required fields correctly.");
       return; // stop submit
     }
-
+    
     // --- Kirim data pakai FormData untuk file ---
     const formData = new FormData();
 
-    // Append text fields
+    // Append text fields (BIODATA & EMPLOYMENT)
     formData.append("nik", employee.nik);
     formData.append("name", employee.name);
     formData.append("birth_place", employee.placeOfBirth);
@@ -248,7 +247,24 @@ export default function AddParttimeEmployee() {
     formData.append("tax_number", employee.npwp);
     formData.append("department_id", employee.department || "");
     formData.append("position", employee.position);
-    formData.append("employment_type", "Parttime");
+    formData.append("employment_type", "parttime");
+
+    // === TAMBAHAN: KIRIM DATA PAYROLL ===
+    formData.append("salary_all_in", employee.salaryAllIn);
+    formData.append("salary_basic", employee.salaryBasic);
+    formData.append("fixed_allowance", employee.fixedAllowance);
+    formData.append("non_fixed_allowance", employee.nonFixedAllowance);
+    formData.append("bpjs_employment", employee.bpjsEmployment);
+    formData.append("bpjs_health", employee.bpjsHealth);
+
+    // === TAMBAHAN: KIRIM DATA CONTRACT ===
+    formData.append("date_join", employee.dateJoin);
+    formData.append("date_end", employee.dateEnd);
+
+    // === TAMBAHAN: KIRIM DATA MCU ===
+    formData.append("mcu_date", employee.mcuHistory);
+
+    // === KIRIM DATA TRAINING ===
     formData.append("training_detail", training.detail);
     formData.append("training_date", training.trainingDate || "");
     formData.append("expiry_date", training.expiryDate || "");
@@ -345,7 +361,7 @@ export default function AddParttimeEmployee() {
                     ) : (
                       <input
                         name={name}
-                        type={name === "age" ? "text" : type} // read-only untuk age
+                        type={name === "age" ? "text" : type}
                         placeholder={label}
                         value={(employee as any)[name]}
                         onChange={handleChange}
@@ -482,6 +498,7 @@ export default function AddParttimeEmployee() {
                       {errors["dateJoin"]}
                     </span>
                   )}
+
                 </div>
 
                 {/* Dropdown Department */}
@@ -518,6 +535,7 @@ export default function AddParttimeEmployee() {
                       {errors["dateEnd"]}
                     </span>
                   )}
+
                 </div>
               </div>
             </section>
@@ -539,6 +557,7 @@ export default function AddParttimeEmployee() {
                     <label className="font-semibold text-gray-700 mb-1">
                       {label}
                     </label>
+
                     <input
                       name={name}
                       placeholder={label}
@@ -547,13 +566,11 @@ export default function AddParttimeEmployee() {
                       className="border p-2 rounded"
                     />
 
-                    {/* PESAN ERROR FORMAT RUPIAH */}
                     {errors[name] && (
-                      <span className="text-red-600 text-xs mt-1">
+                      <span className="text-red-600 text-sm mt-1">
                         {errors[name]}
                       </span>
                     )}
-
                   </div>
                 ))}
               </div>
@@ -586,6 +603,7 @@ export default function AddParttimeEmployee() {
                         {errors[name]}
                       </span>
                     )}
+
                   </div>
                 ))}
               </div>
@@ -646,4 +664,3 @@ export default function AddParttimeEmployee() {
     </div>
   );
 }
-

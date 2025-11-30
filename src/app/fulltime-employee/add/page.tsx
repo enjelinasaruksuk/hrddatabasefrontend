@@ -226,10 +226,11 @@ export default function AddFulltimeEmployee() {
       alert("Please fill all required fields correctly.");
       return; // stop submit
     }
+    
     // --- Kirim data pakai FormData untuk file ---
     const formData = new FormData();
 
-    // Append text fields
+    // Append text fields (BIODATA & EMPLOYMENT)
     formData.append("nik", employee.nik);
     formData.append("name", employee.name);
     formData.append("birth_place", employee.placeOfBirth);
@@ -246,7 +247,24 @@ export default function AddFulltimeEmployee() {
     formData.append("tax_number", employee.npwp);
     formData.append("department_id", employee.department || "");
     formData.append("position", employee.position);
-    formData.append("employment_type", "Fulltime");
+    formData.append("employment_type", "fulltime");
+
+    // === TAMBAHAN: KIRIM DATA PAYROLL ===
+    formData.append("salary_all_in", employee.salaryAllIn);
+    formData.append("salary_basic", employee.salaryBasic);
+    formData.append("fixed_allowance", employee.fixedAllowance);
+    formData.append("non_fixed_allowance", employee.nonFixedAllowance);
+    formData.append("bpjs_employment", employee.bpjsEmployment);
+    formData.append("bpjs_health", employee.bpjsHealth);
+
+    // === TAMBAHAN: KIRIM DATA CONTRACT ===
+    formData.append("date_join", employee.dateJoin);
+    formData.append("date_end", employee.dateEnd);
+
+    // === TAMBAHAN: KIRIM DATA MCU ===
+    formData.append("mcu_date", employee.mcuHistory);
+
+    // === KIRIM DATA TRAINING ===
     formData.append("training_detail", training.detail);
     formData.append("training_date", training.trainingDate || "");
     formData.append("expiry_date", training.expiryDate || "");
@@ -343,7 +361,7 @@ export default function AddFulltimeEmployee() {
                     ) : (
                       <input
                         name={name}
-                        type={name === "age" ? "text" : type} // read-only untuk age
+                        type={name === "age" ? "text" : type}
                         placeholder={label}
                         value={(employee as any)[name]}
                         onChange={handleChange}
@@ -548,7 +566,6 @@ export default function AddFulltimeEmployee() {
                       className="border p-2 rounded"
                     />
 
-                    {/* PESAN ERROR FORMAT RUPIAH */}
                     {errors[name] && (
                       <span className="text-red-600 text-sm mt-1">
                         {errors[name]}
