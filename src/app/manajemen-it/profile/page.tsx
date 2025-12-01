@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LogOut } from "lucide-react";
 
 export default function ProfilePage() {
@@ -10,39 +10,132 @@ export default function ProfilePage() {
   const pathname = usePathname();
   const [fileName, setFileName] = useState("No File Chosen");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [password, setPassword] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Form state
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [currentPhotoUrl, setCurrentPhotoUrl] = useState<string | null>(null);
+
+  // Load profile data saat component mount
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/");
+        return;
+      }
+
+      const response = await fetch("http://localhost:5000/api/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch profile");
+      }
+
+      const data = await response.json();
+      const user = data.user;
+
+      setUsername(user.username || "");
+      setPhoneNumber(user.phone_number || "");
+      
+      if (user.profile_photo_url) {
+        setCurrentPhotoUrl(user.profile_photo_url);
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setErrorMessage("Failed to load profile data");
+      setTimeout(() => setErrorMessage(null), 3000);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setFileName(file.name);
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setPreviewUrl(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSubmit = (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    if (password && password.length < 8) {
+    if (password && password.length < 8 && password.length > 0) {
       setErrorMessage("❌ Password must be at least 8 characters long.");
       setSuccessMessage(null);
       setTimeout(() => setErrorMessage(null), 3000);
       return;
     }
 
+    setIsLoading(true);
     setErrorMessage(null);
-    setSuccessMessage("✅ Profile successfully updated!");
-    setTimeout(() => setSuccessMessage(null), 3000);
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/");
+        return;
+      }
+
+      const formData = new FormData();
+      if (username) formData.append("username", username);
+      if (password) formData.append("password", password);
+      if (phoneNumber) formData.append("phone_number", phoneNumber);
+      if (selectedFile) formData.append("profile_photo", selectedFile);
+
+      const response = await fetch("http://localhost:5000/api/profile", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update profile");
+      }
+
+      setSuccessMessage("✅ Profile successfully updated!");
+      setTimeout(() => setSuccessMessage(null), 3000);
+
+      // Clear password field dan file selection
+      setPassword("");
+      setSelectedFile(null);
+      setFileName("No File Chosen");
+      setPreviewUrl(null);
+
+      // Reload profile data
+      fetchProfile();
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      setErrorMessage(`❌ ${error.message || "Failed to update profile"}`);
+      setTimeout(() => setErrorMessage(null), 3000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogoutClick = () => setShowLogoutModal(true);
   const handleLogoutCancel = () => setShowLogoutModal(false);
   const handleLogoutConfirm = () => {
+    localStorage.removeItem("token");
     setShowLogoutModal(false);
     router.push("/");
   };
@@ -113,15 +206,14 @@ export default function ProfilePage() {
         <div className="bg-white shadow-lg rounded-2xl p-8 w-[80%] mx-auto border border-gray-100">
           <div className="flex items-center gap-6 mb-8">
             <div className="relative">
-              {previewUrl ? (
+              {previewUrl || currentPhotoUrl ? (
                 <img
-                  src={previewUrl}
-                  alt="Profile Preview"
+                  src={previewUrl || currentPhotoUrl || ""}
+                  alt="Profile"
                   className="w-24 h-24 rounded-full object-cover border-4 border-[#FDD835]"
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center border-4 border-[#FDD835]">
-                  {/* ✅ Ikon Person Placeholder Baru */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -144,6 +236,7 @@ export default function ProfilePage() {
               <input
                 id="file-upload"
                 type="file"
+                accept="image/*"
                 className="hidden"
                 onChange={handleFileChange}
               />
@@ -156,11 +249,13 @@ export default function ProfilePage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-lg font-medium mb-1 text-gray-800">
-                Name:
+                Username:
               </label>
               <input
                 type="text"
-                placeholder="Enter your name"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full p-3 bg-[#fef3c7] rounded-md border-none focus:ring-2 focus:ring-yellow-400 outline-none"
               />
             </div>
@@ -171,7 +266,7 @@ export default function ProfilePage() {
               </label>
               <input
                 type="password"
-                placeholder="Enter new password"
+                placeholder="Enter new password (leave blank to keep current)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-3 bg-[#fef3c7] rounded-md border-none focus:ring-2 focus:ring-yellow-400 outline-none"
@@ -185,17 +280,19 @@ export default function ProfilePage() {
               <input
                 type="text"
                 placeholder="Enter phone number"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 className="w-full p-3 bg-[#fef3c7] rounded-md border-none focus:ring-2 focus:ring-yellow-400 outline-none"
               />
             </div>
 
             <div className="flex justify-end gap-3 mt-4">
               <button
-                type="button"
-                onClick={() => handleSubmit()}
-                className="bg-[#FDD835] text-black px-8 py-2 rounded-md font-semibold hover:bg-yellow-300 transition"
+                type="submit"
+                disabled={isLoading}
+                className="bg-[#FDD835] text-black px-8 py-2 rounded-md font-semibold hover:bg-yellow-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save
+                {isLoading ? "Saving..." : "Save"}
               </button>
             </div>
           </form>
