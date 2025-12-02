@@ -195,83 +195,83 @@ export default function EditEmployee() {
   // --------------------------
   // SUBMIT UPDATE
   // --------------------------
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+ const handleSubmit = async (e: any) => {
+  e.preventDefault();
 
-    const formData = new FormData();
+  const formData = new FormData();
 
-    // mapping frontend -> backend
-    const mapping: Record<string, string> = {
-      nik: "NIK",
-      name: "name",
-      motherName: "mother_name",
-      address: "address",
-      religion: "religion",
-      dob: "birth_date",
-      age: "age",
-      placeOfBirth: "birth_place",
-      maritalStatus: "marital_status",
-      phone: "phone_number",
-      identityNumber: "identity_number",
-      lastEducation: "last_education",
-      npwp: "tax_number",
-      accountNumber: "bank_account",
-      division: "division_name",
-      department: "department_id",
-      dateJoin: "date_join",
-      dateEnd: "date_end",
-      position: "position",
-      mcuHistory: "mcu_history",
-      trainingList: "training_list",
-      salaryAllIn: "salary_all_in",
-      salaryBasic: "salary_basic",
-      fixedAllowance: "fixed_allowance",
-      nonFixedAllowance: "allowance_irregular",
-      bpjsEmployment: "bpjs_employment",
-      bpjsHealth: "bpjs_health",
-    };
-
-    // append data biasa
-    Object.entries(mapping).forEach(([front, back]) => {
-      let value = (employee as any)[front];
-
-      // salary: convert to number
-      if (["salaryAllIn", "salaryBasic", "fixedAllowance", "nonFixedAllowance"].includes(front)) {
-        value = value.toString().replace(/\./g, ""); // hapus titik
-      }
-
-      // department_id: number
-      if (front === "department") value = Number(value);
-
-      formData.append(back, value || "");
-    });
-
-    // append files (hanya jika user upload file baru)
-    Object.entries(employee.files).forEach(([key, file]) => {
-      if (file instanceof File) formData.append(key, file);
-    });
-
-    try {
-      const res = await fetch(`http://localhost:5000/api/employees/${id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("Server error:", text);
-        alert("Failed to update data!");
-        return;
-      }
-
-      alert("Updated successfully!");
-      router.push("/fulltime-employee");
-
-    } catch (err) {
-      console.error(err);
-      alert("connection to server failed!");
-    }
+  // mapping frontend -> backend
+  const mapping: Record<string, string> = {
+    nik: "NIK",
+    name: "name",
+    motherName: "mother_name",
+    address: "address",
+    religion: "religion",
+    dob: "birth_date",
+    age: "age",
+    placeOfBirth: "birth_place",
+    maritalStatus: "marital_status",
+    phone: "phone_number",
+    identityNumber: "identity_number",
+    lastEducation: "last_education",
+    npwp: "tax_number",
+    accountNumber: "bank_account",
+    division: "division_name",
+    department: "department_id",
+    dateJoin: "date_join",
+    dateEnd: "date_end",
+    position: "position",
+    mcuHistory: "mcu_history",
+    trainingList: "training_list",
+    salaryAllIn: "salary_all_in",
+    salaryBasic: "salary_basic",
+    fixedAllowance: "fixed_allowance",
+    nonFixedAllowance: "allowance_irregular",
+    bpjsEmployment: "bpjs_employment",
+    bpjsHealth: "bpjs_health",
   };
+
+  // append data biasa
+  Object.entries(mapping).forEach(([front, back]) => {
+    let value = (employee as any)[front];
+    
+    // salary: convert to number
+    if (["salaryAllIn","salaryBasic","fixedAllowance","nonFixedAllowance"].includes(front)) {
+      value = value.toString().replace(/\./g,""); // hapus titik
+    }
+
+    // department_id: number
+    if (front === "department") value = Number(value);
+
+    formData.append(back, value || "");
+  });
+
+  // append files (hanya jika user upload file baru)
+  Object.entries(employee.files).forEach(([key, file]) => {
+    if (file instanceof File) formData.append(key, file);
+  });
+
+  try {
+    const res = await fetch(`http://localhost:5000/api/employees/${id}`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("Server error:", text);
+      alert("Failed to update data!");
+      return;
+    }
+
+    alert("Updated successfully!");
+    router.push("/parttime-employee");
+
+  } catch (err) {
+    console.error(err);
+    alert("connection to server failed!");
+  }
+};
 
 
   return (
@@ -284,7 +284,6 @@ export default function EditEmployee() {
         >
           ×
         </button>
-
 
         <h1 className="text-3xl font-bold mb-6 text-center">
           Edit Employee
