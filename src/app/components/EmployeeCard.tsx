@@ -14,7 +14,7 @@ export default function EmployeeCard({ total }: EmployeeCardProps) {
         <h2 className="font-semibold text-lg">Total Employees</h2>
       </div>
       <p className="text-5xl font-bold">{total}</p>
-      <p className="text-sm mt-2 text-gray-700">Total Active Employees</p>
+      <p className="text-sm mt-2 text-gray-700">Total Employees in Database</p>
     </div>
   );
 }
