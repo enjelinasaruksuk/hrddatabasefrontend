@@ -1,14 +1,14 @@
 "use client";
 
-interface StatsProps {
-  active: number;
-  contract: number;
+interface EmployeeStatsProps {
+  fulltime: number;
+  parttime: number;
 }
 
-export default function EmployeeStats({ active, contract }: StatsProps) {
-  const total = active + contract;
-  const activePercent = Math.round((active / total) * 100);
-  const contractPercent = Math.round((contract / total) * 100);
+export default function EmployeeStats({ fulltime, parttime }: EmployeeStatsProps) {
+  const total = fulltime + parttime;
+  const fulltimePercent = total ? Math.round((fulltime / total) * 100) : 0;
+  const parttimePercent = total ? Math.round((parttime / total) * 100) : 0;
 
   return (
     <div className="bg-gradient-to-br from-yellow-100 to-yellow-50 rounded-xl p-6 shadow-md w-full border border-yellow-200">
@@ -16,29 +16,29 @@ export default function EmployeeStats({ active, contract }: StatsProps) {
       <div className="space-y-4">
         <div>
           <p className="text-sm font-medium mb-1 text-gray-700">
-            Total Active Employees{" "}
+            Fulltime Employees{" "}
             <span className="text-gray-600">
-              {active} ({activePercent}%)
+              {fulltime} ({fulltimePercent}%)
             </span>
           </p>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <div
               className="bg-yellow-500 h-2.5 rounded-full"
-              style={{ width: `${activePercent}%` }}
+              style={{ width: `${fulltimePercent}%` }}
             ></div>
           </div>
         </div>
         <div>
           <p className="text-sm font-medium mb-1 text-gray-700">
-            Total Contract Employees{" "}
+            Parttime Employees{" "}
             <span className="text-gray-600">
-              {contract} ({contractPercent}%)
+              {parttime} ({parttimePercent}%)
             </span>
           </p>
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <div
               className="bg-yellow-300 h-2.5 rounded-full"
-              style={{ width: `${contractPercent}%` }}
+              style={{ width: `${parttimePercent}%` }}
             ></div>
           </div>
         </div>
