@@ -1,5 +1,7 @@
 "use client";
 
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FiEdit, FiTrash2, FiChevronDown } from "react-icons/fi";
@@ -9,13 +11,44 @@ import Layout from "../components/Layout";
 interface Employee {
   NIK: number;
   name: string;
-  birth_place?: string | null;
-  age?: number | null;
+  birth_place: string | null;
+  birth_date?: string | null;
+  age: number | null;
+  mother_name?: string | null;
+  religion?: string | null;
+  address?: string | null;
   phone_number?: string | null;
+  marital_status?: string | null;
+  last_education?: string | null;
+  bank_account?: string | null;
+  identity_number?: string | null;
+  tax_number?: string | null;
   department_id?: number | null;
   position?: string | null;
+  employment_type?: string | null;
   division_name?: string | null;
   department_name?: string | null;
+  salary_all_in?: number | null;
+  salary_basic?: number | null;
+  fixed_allowance?: number | null;
+  allowance_irregular?: number | null;
+  bpjs_employment?: string | null;
+  bpjs_health?: string | null;
+  date_join?: string | null;
+  date_end?: string | null;
+  contract_status?: string | null;
+  last_mcu_date?: string | null;
+  training_list?: string | null;
+  photo?: string | null;
+  file_ktp?: string | null;
+  file_npwp?: string | null;
+  file_bpjs_kesehatan?: string | null;
+  file_bpjs_ketenagakerjaan?: string | null;
+  file_kk?: string | null;
+  file_training?: string | null;
+  file_mcu?: string | null;
+  file_cv?: string | null;
+  file_ijazah?: string | null;
 }
 
 // daftar division & department (bisa fetch dari backend)
@@ -61,6 +94,74 @@ export default function FulltimeEmployeePage() {
     if (!confirm("Are you sure to delete this employee?")) return;
     await fetch(`http://localhost:5000/api/employees/${nik}`, { method: "DELETE" });
     setEmployees(prev => prev.filter(emp => emp.NIK !== nik));
+  };
+
+  const downloadAllEmployeesExcel = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/employees/type/parttime`);
+      const data: Employee[] = await res.json();
+
+      if (!data || data.length === 0) {
+        alert("No employee data available");
+        return;
+      }
+      console.log(data);
+
+      const excelData = data.map(emp => ({
+        NIK: emp.NIK,
+        Name: emp.name || "-",
+        BirthPlace: emp.birth_place || "-",
+        BirthDate: emp.birth_date ? new Date(emp.birth_date).toISOString().split('T')[0] : "-",
+        Age: emp.age ?? "-",
+        MotherName: emp.mother_name || "-",
+        Religion: emp.religion || "-",
+        Address: emp.address || "-",
+        Phone: emp.phone_number || "-",
+        MaritalStatus: emp.marital_status || "-",
+        LastEducation: emp.last_education || "-",
+        BankAccount: emp.bank_account || "-",
+        IdentityNumber: emp.identity_number || "-",
+        TaxNumber: emp.tax_number || "-",
+        Division: emp.division_name || "-",
+        Department: emp.department_name || "-",
+        Position: emp.position || "-",
+        EmploymentType: emp.employment_type || "-",
+        SalaryAllIn: emp.salary_all_in ?? 0,
+        SalaryBasic: emp.salary_basic ?? 0,
+        FixedAllowance: emp.fixed_allowance ?? 0,
+        NonFixedAllowance: emp.allowance_irregular ?? 0,
+        BPJSEmployment: emp.bpjs_employment || "-",
+        BPJSHealth: emp.bpjs_health || "-",
+        ContractStart: emp.date_join ? new Date(emp.date_join).toISOString().split('T')[0] : "-",
+        ContractEnd: emp.date_end ? new Date(emp.date_end).toISOString().split('T')[0] : "-",
+        ContractStatus: emp.contract_status || "-",
+        MCUHistory: emp.last_mcu_date
+          ? new Date(emp.last_mcu_date).toISOString().split("T")[0]
+          : "-",
+        TrainingList: emp.training_list || "-",
+        PhotoFile: emp.photo || "-",
+        KTPFile: emp.file_ktp || "-",
+        NPWPFile: emp.file_npwp || "-",
+        BPJSHealthFile: emp.file_bpjs_kesehatan || "-",
+        BPJSEmploymentFile: emp.file_bpjs_ketenagakerjaan || "-",
+        KKFile: emp.file_kk || "-",
+        TrainingFile: emp.file_training || "-",
+        MCUFile: emp.file_mcu || "-",
+        CVFile: emp.file_cv || "-",
+        DegreeFile: emp.file_ijazah || "-"
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Parttime Employees");
+
+      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([wbout], { type: "application/octet-stream" });
+      saveAs(blob, "Parttime Employees.xlsx");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to download Excel");
+    }
   };
 
   return (
@@ -156,7 +257,12 @@ export default function FulltimeEmployeePage() {
             </div>
           </div>
         </div>
-        <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">Excel</button>
+        <button
+          className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+          onClick={downloadAllEmployeesExcel} // <- sambungkan fungsi di sini
+        >
+          Excel
+        </button>
       </div>
 
       {loading ? (
