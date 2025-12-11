@@ -12,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const handleLogoutConfirm = () => {
     setShowLogoutModal(false);
-    router.push("/");
+    router.push("/"); // Arahkan ke halaman utama setelah logout
   };
 
   const handleLogoutCancel = () => {
@@ -37,16 +37,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 ? "/manajemen-it/fulltime-employee"
                 : pathname.startsWith("/manajemen-it/parttime-employee")
                 ? "/manajemen-it/parttime-employee"
-                : "/"
+                : pathname.startsWith("/manajemen-it/contract-employee")
+                ? "/manajemen-it/contract-employee"
+                : "/manajemen-it/dashboard" // Default ke dashboard manajemen-it
             }
             className="absolute left-1/2 transform -translate-x-1/2 text-2xl font-semibold text-gray-800 hover:text-yellow-700 transition"
           >
-            {pathname === "/" || pathname === "/manajemen-it/dashboard"
+            {pathname === "/manajemen-it/dashboard"
               ? "Dashboard"
               : pathname.startsWith("/manajemen-it/fulltime-employee")
               ? "Fulltime Employee"
               : pathname.startsWith("/manajemen-it/parttime-employee")
               ? "Parttime Employee"
+              : pathname.startsWith("/manajemen-it/contract-employee")
+              ? "Expired Contracts"
               : pathname.startsWith("/manajemen-it/reminder")
               ? "Reminder"
               : "PT. Lancang Kuning Sukses HR Database"}
@@ -122,7 +126,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Link href="/manajemen-it/dashboard">
             <div
               className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
-                pathname === "/" || pathname === "/manajemen-it/dashboard"
+                pathname === "/manajemen-it/dashboard"
                   ? "bg-yellow-200 shadow-sm"
                   : "hover:bg-yellow-200"
               }`}
@@ -132,7 +136,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </div>
               <span
                 className={`text-sm text-black ${
-                  pathname === "/" || pathname === "/manajemen-it/dashboard"
+                  pathname === "/manajemen-it/dashboard"
                     ? "font-semibold"
                     : "font-medium"
                 }`}
@@ -184,6 +188,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 }`}
               >
                 Parttime Employee
+              </span>
+            </div>
+          </Link>
+
+          {/* New Link for Expired Contracts */}
+          <Link href="/manajemen-it/contract-employee">
+            <div
+              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
+                pathname?.startsWith("/manajemen-it/contract-employee")
+                  ? "bg-yellow-200 shadow-sm"
+                  : "hover:bg-yellow-200"
+              }`}
+            >
+              <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
+                ⚠️
+              </div>
+              <span
+                className={`text-sm text-black ${
+                  pathname?.startsWith("/manajemen-it/contract-employee")
+                    ? "font-semibold"
+                    : "font-medium"
+                }`}
+              >
+                Expired Contracts
               </span>
             </div>
           </Link>

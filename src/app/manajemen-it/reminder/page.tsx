@@ -1,89 +1,151 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 
 export default function ReminderPage() {
-  const [urgentList, setUrgentList] = useState([]);
-  const [attentionList, setAttentionList] = useState([]);
+  const [contracts, setContracts] = useState([]);
 
   useEffect(() => {
-    fetchEmployees();
+    fetch("http://localhost:5000/api/reminder/contracts")
+      .then((res) => res.json())
+      .then((data) => setContracts(data))
+      .catch((err) => console.error("Fetch error:", err));
   }, []);
 
-  const fetchEmployees = async () => {
-    const res = await fetch("http://localhost:5000/api/employees");
-    const data = await res.json();
+  const handleShowDetail = (item: any) => {
+    localStorage.setItem("contractDetail", JSON.stringify(item));
 
-    const today = new Date();
+    // ➕ Tambahan untuk highlight di halaman berikutnya
+    localStorage.setItem("selectedContractId", item.id);
 
-    const urgent = [];
-    const attention = [];
-
-    data.forEach((emp) => {
-      const endDate = new Date(emp.date_end);
-      const timeDiff = endDate.getTime() - today.getTime();
-      const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)); // beda hari
-
-      if (dayDiff <= 7 && dayDiff >= 0) {
-        urgent.push({ ...emp, daysLeft: dayDiff });
-      } else if (dayDiff <= 30 && dayDiff > 7) {
-        attention.push({ ...emp, daysLeft: dayDiff });
-      }
-    });
-
-    setUrgentList(urgent);
-    setAttentionList(attention);
+    window.dispatchEvent(new Event("contract-detail-update"));
+    window.location.href = "/contract-employee";
   };
+
+  const urgentContracts = contracts.filter((c: any) => c.days_left <= 7);
+  const attentionContracts = contracts.filter(
+    (c: any) => c.days_left > 7 && c.days_left <= 30
+  );
 
   return (
     <Layout>
       <div className="p-6 font-['Cambria'] text-gray-800">
-        {/* Header */}
         <h1 className="text-2xl font-bold mb-6">Reminder</h1>
 
-        {/* URGENT */}
+        {/* Urgent TABLE */}
         <section className="mb-10">
-          <h2 className="text-lg font-semibold mb-4 text-yellow-700">
+          <h2 className="text-lg font-semibold mb-4">
             Urgent – Follow up immediately
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {urgentList.map((emp, i) => (
-              <div
-                key={i}
-                className="bg-gradient-to-br from-yellow-100 to-white border border-yellow-200 rounded-lg p-5 shadow-md"
-              >
-                <h3 className="font-semibold mb-3 text-gray-800">
-                  End of Contract
-                </h3>
-                <p><strong>Name:</strong> {emp.name}</p>
-                <p><strong>Position:</strong> {emp.position}</p>
-                <p><strong>End of Contract:</strong> {emp.daysLeft} days left</p>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-400">
+              <thead className="bg-yellow-300">
+                <tr>
+                  <th className="border border-gray-400 px-3 py-2">No</th>
+                  <th className="border border-gray-400 px-3 py-2">Name</th>
+                  <th className="border border-gray-400 px-3 py-2">Position</th>
+                  <th className="border border-gray-400 px-3 py-2">Days Left</th>
+                  <th className="border border-gray-400 px-3 py-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {urgentContracts.map((item: any, index: number) => (
+                  <tr key={index} className="bg-yellow-100">
+                    <td className="border border-gray-400 px-3 py-2">
+                      {index + 1}
+                    </td>
+                    <td className="border border-gray-400 px-3 py-2">
+                      {item.name}
+                    </td>
+                    <td className="border border-gray-400 px-3 py-2">
+                      {item.position}
+                    </td>
+                    <td className="border border-gray-400 px-3 py-2 font-semibold text-red-600">
+                      {item.days_left} days
+                    </td>
+                    <td className="border border-gray-400 px-3 py-2">
+                      <button
+                        onClick={() => handleShowDetail(item)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"
+                      >
+                        Show Detail
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+
+                {urgentContracts.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="border border-gray-400 px-3 py-2 text-center italic"
+                    >
+                      No urgent contracts
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </section>
 
-        {/* ATTENTION */}
+        {/* Attention TABLE */}
         <section>
-          <h2 className="text-lg font-semibold mb-4 text-yellow-700">
+          <h2 className="text-lg font-semibold mb-4">
             Attention – Within 30 Days
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {attentionList.map((emp, i) => (
-              <div
-                key={i}
-                className="bg-gradient-to-br from-yellow-100 to-white border border-yellow-200 rounded-lg p-5 shadow-md"
-              >
-                <h3 className="font-semibold mb-3 text-gray-800">
-                  End of Contract
-                </h3>
-                <p><strong>Name:</strong> {emp.name}</p>
-                <p><strong>Position:</strong> {emp.position}</p>
-                <p><strong>End of Contract:</strong> {emp.daysLeft} days left</p>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-400">
+              <thead className="bg-yellow-300">
+                <tr>
+                  <th className="border border-gray-400 px-3 py-2">No</th>
+                  <th className="border border-gray-400 px-3 py-2">Name</th>
+                  <th className="border border-gray-400 px-3 py-2">Position</th>
+                  <th className="border border-gray-400 px-3 py-2">Days Left</th>
+                  <th className="border border-gray-400 px-3 py-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attentionContracts.map((item: any, index: number) => (
+                  <tr key={index} className="bg-yellow-100">
+                    <td className="border border-gray-400 px-3 py-2">
+                      {index + 1}
+                    </td>
+                    <td className="border border-gray-400 px-3 py-2">
+                      {item.name}
+                    </td>
+                    <td className="border border-gray-400 px-3 py-2">
+                      {item.position}
+                    </td>
+                    <td className="border border-gray-400 px-3 py-2 text-orange-600 font-semibold">
+                      {item.days_left} days
+                    </td>
+                    <td className="border border-gray-400 px-3 py-2">
+                      <button
+                        onClick={() => handleShowDetail(item)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"
+                      >
+                        Show Detail
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+
+                {attentionContracts.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="border border-gray-400 px-3 py-2 text-center italic"
+                    >
+                      No contracts within 30 days
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </section>
       </div>

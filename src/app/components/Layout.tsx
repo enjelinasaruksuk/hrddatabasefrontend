@@ -2,13 +2,32 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiLogOut, FiBell, FiUser } from "react-icons/fi";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  // ====== 👇 BAGIAN BARU: Ambil jumlah data yang akan expire ======
+  const [notifCount, setNotifCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchReminderCount() {
+      try {
+const res = await fetch("http://localhost:5000/api/reminder/count");
+        const data = await res.json();
+
+        setNotifCount(data.total || 0);
+      } catch (error) {
+        console.log("Failed to fetch:", error);
+      }
+    }
+
+    fetchReminderCount();
+  }, []);
+  // ===============================================================
 
   const handleLogoutConfirm = () => {
     setShowLogoutModal(false);
@@ -37,6 +56,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 ? "/fulltime-employee"
                 : pathname.startsWith("/parttime-employee")
                 ? "/parttime-employee"
+                : pathname.startsWith("/contract-employee")
+                ? "/contract-employee"
                 : "/"
             }
             className="absolute left-1/2 transform -translate-x-1/2 text-2xl font-semibold text-gray-800 hover:text-yellow-700 transition"
@@ -47,6 +68,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               ? "Fulltime Employee"
               : pathname.startsWith("/parttime-employee")
               ? "Parttime Employee"
+              : pathname.startsWith("/contract-employee")
+              ? "Expired Contracts"
               : pathname.startsWith("/reminder")
               ? "Reminder"
               : "PT. Lancang Kuning Sukses HR Database"}
@@ -55,14 +78,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         {/* Navbar Icons */}
         <div className="flex items-center gap-2">
-          <Link href="/reminder">
+
+          {/* ================== BADGE NOTIF ================== */}
+          <Link href="/reminder" className="relative">
             <button
               aria-label="reminder"
               className="p-2 rounded-full hover:bg-yellow-200 transition"
             >
               <FiBell size={20} />
             </button>
+
+            {notifCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] px-[6px] py-[1px] rounded-full font-bold">
+                {notifCount > 9 ? "9+" : notifCount}
+              </span>
+            )}
           </Link>
+          {/* ================================================= */}
+
           <Link href="/profile">
             <button
               aria-label="profile"
@@ -71,6 +104,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <FiUser size={20} />
             </button>
           </Link>
+
           <button
             aria-label="logout"
             onClick={() => setShowLogoutModal(true)}
@@ -94,8 +128,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </h3>
             </div>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to logout? You will be redirected to the
-              home page.
+              Are you sure you want to logout? You will be redirected to the home page.
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -184,6 +217,29 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 }`}
               >
                 Parttime Employee
+              </span>
+            </div>
+          </Link>
+
+          <Link href="/contract-employee">
+            <div
+              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
+                pathname?.startsWith("/contract-employee")
+                  ? "bg-yellow-200 shadow-sm"
+                  : "hover:bg-yellow-200"
+              }`}
+            >
+              <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
+                ⚠️
+              </div>
+              <span
+                className={`text-sm text-black ${
+                  pathname?.startsWith("/contract-employee")
+                    ? "font-semibold"
+                    : "font-medium"
+                }`}
+              >
+                Expired Contracts
               </span>
             </div>
           </Link>

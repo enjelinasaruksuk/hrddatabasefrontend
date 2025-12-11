@@ -55,6 +55,18 @@ export default function EditEmployee() {
     files: {},
   });
 
+  type Training = {
+    detail: string;
+    trainingDate: string;
+    expiryDate: string;
+  };
+
+  const [training, setTraining] = useState<Training>({
+    detail: "",
+    trainingDate: "",
+    expiryDate: "",
+  });
+
   // --------------------------
   // FORMAT RUPIAH
   // --------------------------
@@ -124,10 +136,43 @@ export default function EditEmployee() {
   // --------------------------
   const fetchData = async () => {
     try {
+      // ❌ SALAH - GANTI INI
+      // const res = await fetch(http://localhost:5000/api/employees/${id});
+      // ✅ BENAR - PAKAI INI
       const res = await fetch(`http://localhost:5000/api/employees/${id}`);
+      
       const raw = await res.json();
       const data = Array.isArray(raw) ? raw[0] : raw;
       console.log("DATA DARI BACKEND:", data);
+
+      // Parse MCU History (format: "05/10/2025" -> "2025-10-05")
+      let mcuHistoryDate = "";
+      if (data.mcu_history) {
+        const mcuParts = data.mcu_history.split("/");
+        if (mcuParts.length === 3) {
+          // ❌ SALAH - GANTI INI
+          // mcuHistoryDate = ${mcuParts[2]}-${mcuParts[1]}-${mcuParts[0]};
+          // ✅ BENAR - PAKAI INI
+          mcuHistoryDate = `${mcuParts[2]}-${mcuParts[1]}-${mcuParts[0]}`;
+        }
+      }
+
+      // Parse Training List 
+      let trainingDetail = "";
+      let trainingDateParsed = "";
+      if (data.training_list) {
+        const match = data.training_list.match(/^(.+?)\s*\((\d{2}\/\d{2}\/\d{4})\)$/);
+        if (match) {
+          trainingDetail = match[1].trim();
+          const dateParts = match[2].split("/");
+          // ❌ SALAH - GANTI INI
+          // trainingDateParsed = ${dateParts[2]}-${dateParts[1]}-${dateParts[0]};
+          // ✅ BENAR - PAKAI INI
+          trainingDateParsed = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        } else {
+          trainingDetail = data.training_list;
+        }
+      }
 
       setEmployee((prev: any) => ({
         ...prev,
@@ -153,8 +198,7 @@ export default function EditEmployee() {
         dateJoin: data.date_join?.split("T")[0] || "",
         dateEnd: data.date_end?.split("T")[0] || "",
         position: data.position || "",
-        mcuHistory: data.mcu_history || "",
-        trainingList: data.training_list || "",
+        mcuHistory: mcuHistoryDate || "",
 
         // Payroll
         salaryAllIn: formatRupiah(String(data.salary_all_in || "")),
@@ -181,6 +225,19 @@ export default function EditEmployee() {
         }
       }));
 
+      // Set training data
+      setTraining({
+        detail: trainingDetail || data.training_detail || "",
+        trainingDate: trainingDateParsed || data.training_date?.split("T")[0] || "",
+        expiryDate: data.expiry_date?.split("T")[0] || "",
+      });
+      
+      console.log("Parsed Training data:", {
+        original: data.training_list,
+        detail: trainingDetail,
+        trainingDate: trainingDateParsed,
+        expiryDate: data.expiry_date
+      });
 
     } catch (err) {
       console.error(err);
@@ -198,53 +255,119 @@ export default function EditEmployee() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
+    let hasError = false;
+    const newErrors: Record<string, string> = {};
+
+    // List field yang wajib diisi
+    const requiredFields = [
+      "name",
+      "motherName",
+      "address",
+      "religion",
+      "dob",
+      "placeOfBirth",
+      "maritalStatus",
+      "phone",
+      "identityNumber",
+      "lastEducation",
+      "nik",
+      "npwp",
+      "accountNumber",
+      "division",
+      "dateJoin",
+      "dateEnd",
+      "department",
+      "position",
+      "salaryAllIn",
+      "fixedAllowance",
+      "salaryBasic",
+      "nonFixedAllowance",
+      "bpjsEmployment",
+      "bpjsHealth"
+    ];
+
+    // Cek setiap field wajib
+    requiredFields.forEach((field) => {
+      if (!(employee as any)[field]) {
+        newErrors[field] = "*This field is required";
+        hasError = true;
+      }
+    });
+
+    // Validasi training juga
+    if (!training.detail) {
+      newErrors["trainingDetail"] = "*Training detail is required";
+      hasError = true;
+    }
+    if (!training.trainingDate) {
+      newErrors["trainingDate"] = "*Training date is required";
+      hasError = true;
+    }
+    if (!training.expiryDate) {
+      newErrors["expiryDate"] = "*Expiry date is required";
+      hasError = true;
+    }
+
+    // Validasi numeric fields
+    for (const field in numericRules) {
+      const requiredLength = numericRules[field];
+      const currentValue = (employee as any)[field];
+      if (!currentValue || currentValue.length < requiredLength) {
+        // ❌ SALAH - GANTI INI
+        // newErrors[field] = *Minimum ${requiredLength} digits;
+        // ✅ BENAR - PAKAI INI
+        newErrors[field] = `*Minimum ${requiredLength} digits`;
+        hasError = true;
+      }
+    }
+
+    setErrors(newErrors);
+
+    if (hasError) {
+      alert("Please fill all required fields correctly.");
+      return; // stop submit
+    }
+
     const formData = new FormData();
 
-    // mapping frontend -> backend
-    const mapping: Record<string, string> = {
-      nik: "NIK",
-      name: "name",
-      motherName: "mother_name",
-      address: "address",
-      religion: "religion",
-      dob: "birth_date",
-      age: "age",
-      placeOfBirth: "birth_place",
-      maritalStatus: "marital_status",
-      phone: "phone_number",
-      identityNumber: "identity_number",
-      lastEducation: "last_education",
-      npwp: "tax_number",
-      accountNumber: "bank_account",
-      division: "division_name",
-      department: "department_id",
-      dateJoin: "date_join",
-      dateEnd: "date_end",
-      position: "position",
-      mcuHistory: "mcu_history",
-      trainingList: "training_list",
-      salaryAllIn: "salary_all_in",
-      salaryBasic: "salary_basic",
-      fixedAllowance: "fixed_allowance",
-      nonFixedAllowance: "allowance_irregular",
-      bpjsEmployment: "bpjs_employment",
-      bpjsHealth: "bpjs_health",
-    };
+    // Append data biasa
+    formData.append("nik", employee.nik);
+    formData.append("name", employee.name);
+    formData.append("birth_place", employee.placeOfBirth);
+    formData.append("birth_date", employee.dob || "");
+    formData.append("age", employee.age || "");
+    formData.append("mother_name", employee.motherName);
+    formData.append("religion", employee.religion);
+    formData.append("address", employee.address);
+    formData.append("phone_number", employee.phone);
+    formData.append("marital_status", employee.maritalStatus);
+    formData.append("last_education", employee.lastEducation);
+    formData.append("bank_account", employee.accountNumber);
+    formData.append("identity_number", employee.identityNumber);
+    formData.append("tax_number", employee.npwp);
+    formData.append("department_id", employee.department || "");
+    formData.append("position", employee.position);
+    formData.append("employment_type", "fulltime");
 
-    // append data biasa
-    Object.entries(mapping).forEach(([front, back]) => {
-      let value = (employee as any)[front];
+    // Payroll (convert to number)
+    formData.append("salary_all_in", employee.salaryAllIn.replace(/\./g, ""));
+    formData.append("salary_basic", employee.salaryBasic.replace(/\./g, ""));
+    formData.append("fixed_allowance", employee.fixedAllowance.replace(/\./g, ""));
+    formData.append("non_fixed_allowance", employee.nonFixedAllowance.replace(/\./g, ""));
+    formData.append("bpjs_employment", employee.bpjsEmployment);
+    formData.append("bpjs_health", employee.bpjsHealth);
 
-      // salary: convert to number
-      if (["salaryAllIn", "salaryBasic", "fixedAllowance", "nonFixedAllowance"].includes(front)) {
-        value = value.toString().replace(/\./g, ""); // hapus titik
-      }
+    // Contract
+    formData.append("date_join", employee.dateJoin);
+    formData.append("date_end", employee.dateEnd);
 
-      // department_id: number
-      if (front === "department") value = Number(value);
+    // MCU
+    formData.append("mcu_date", employee.mcuHistory);
 
-      formData.append(back, value || "");
-    });
+    // Training
+    formData.append("training_detail", training.detail);
+    formData.append("training_date", training.trainingDate || "");
+    formData.append("expiry_date", training.expiryDate || "");
 
     // append files (hanya jika user upload file baru)
     Object.entries(employee.files).forEach(([key, file]) => {
@@ -252,6 +375,9 @@ export default function EditEmployee() {
     });
 
     try {
+      // ❌ SALAH - GANTI INI
+      // const res = await fetch(http://localhost:5000/api/employees/${id}, {
+      // ✅ BENAR - PAKAI INI
       const res = await fetch(`http://localhost:5000/api/employees/${id}`, {
         method: "PUT",
         body: formData,
@@ -292,7 +418,7 @@ export default function EditEmployee() {
 
         <form onSubmit={handleSubmit} className="space-y-6 text-sm">
 
-          {/* === BIODATA === */}
+           {/* === BIODATA === */}
           <section>
             <h2 className="text-xl font-semibold mb-3">Biodata</h2>
 
@@ -306,7 +432,6 @@ export default function EditEmployee() {
                 ["dob", "Date of Birth", "date"],
                 ["age", "Age"],
                 ["placeOfBirth", "Place of Birth"],
-                ["maritalStatus", "Marital Status"],
                 ["phone", "Phone Number"],
                 ["identityNumber", "Identity Number"],
                 ["lastEducation", "Last Education"],
@@ -319,9 +444,77 @@ export default function EditEmployee() {
                     value={(employee as any)[field] || ""}
                     onChange={handleChange}
                     className="border p-2 rounded w-full"
+                    readOnly={field === "age"}
                   />
+                  {errors[field] && (
+                    <span className="text-red-600 text-sm mt-1">{errors[field]}</span>
+                  )}
                 </div>
               ))}
+              
+              {/* Marital Status - Dropdown */}
+              <div>
+                <label>Marital Status</label>
+                <select
+                  name="maritalStatus"
+                  value={employee.maritalStatus}
+                  onChange={handleChange}
+                  className="border p-2 rounded w-full bg-white"
+                >
+                  <option value="" disabled>Select Status</option>
+                  <option value="TK">TK</option>
+                  <option value="K/01">K/01</option>
+                  <option value="K/02">K/02</option>
+                </select>
+                {errors["maritalStatus"] && (
+                  <span className="text-red-600 text-sm mt-1">{errors["maritalStatus"]}</span>
+                )}
+              </div>
+
+              {/* Training fields - col-span-2 */}
+              <div className="col-span-2">
+                <div className="flex gap-2 mb-2 items-end">
+                  <div className="flex flex-col w-1/3">
+                    <label className="font-semibold text-gray-700 mb-1">Training List</label>
+                    <input
+                      type="text"
+                      placeholder="Training Detail"
+                      value={training.detail}
+                      onChange={(e) => setTraining({ ...training, detail: e.target.value })}
+                      className="border p-2 rounded"
+                    />
+                    {errors["trainingDetail"] && (
+                      <span className="text-red-600 text-sm mt-1">{errors["trainingDetail"]}</span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col w-1/3">
+                    <label className="font-semibold text-gray-700 mb-1">Training Date</label>
+                    <input
+                      type="date"
+                      value={training.trainingDate}
+                      onChange={(e) => setTraining({ ...training, trainingDate: e.target.value })}
+                      className="border p-2 rounded"
+                    />
+                    {errors["trainingDate"] && (
+                      <span className="text-red-600 text-sm mt-1">{errors["trainingDate"]}</span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col w-1/3">
+                    <label className="font-semibold text-gray-700 mb-1">Expiry Date</label>
+                    <input
+                      type="date"
+                      value={training.expiryDate}
+                      onChange={(e) => setTraining({ ...training, expiryDate: e.target.value })}
+                      className="border p-2 rounded"
+                    />
+                    {errors["expiryDate"] && (
+                      <span className="text-red-600 text-sm mt-1">{errors["expiryDate"]}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -336,8 +529,6 @@ export default function EditEmployee() {
                 ["npwp", "NPWP"],
                 ["accountNumber", "Account Number"],
                 ["position", "Position"],
-                ["mcuHistory", "MCU History"],
-                ["trainingList", "Training List"],
               ].map(([field, label]) => (
                 <div key={field}>
                   <label>{label}</label>
@@ -347,8 +538,26 @@ export default function EditEmployee() {
                     onChange={handleChange}
                     className="border p-2 rounded w-full"
                   />
+                  {errors[field] && (
+                    <span className="text-red-600 text-sm mt-1">{errors[field]}</span>
+                  )}
                 </div>
               ))}
+
+              {/* MCU History */}
+              <div>
+                <label>MCU History</label>
+                <input
+                  type="date"
+                  name="mcuHistory"
+                  value={employee.mcuHistory}
+                  onChange={handleChange}
+                  className="border p-2 rounded w-full"
+                />
+                {errors["mcuHistory"] && (
+                  <span className="text-red-600 text-sm mt-1">{errors["mcuHistory"]}</span>
+                )}
+              </div>
 
               {/* Division */}
               <div>
@@ -365,6 +574,9 @@ export default function EditEmployee() {
                   <option value="EPC 1">EPC 1</option>
                   <option value="EPC 2">EPC 2</option>
                 </select>
+                {errors["division"] && (
+                  <span className="text-red-600 text-sm mt-1">{errors["division"]}</span>
+                )}
               </div>
 
               {/* Date Join */}
@@ -377,6 +589,9 @@ export default function EditEmployee() {
                   onChange={handleChange}
                   className="border p-2 rounded w-full"
                 />
+                {errors["dateJoin"] && (
+                  <span className="text-red-600 text-sm mt-1">{errors["dateJoin"]}</span>
+                )}
               </div>
 
               {/* Department */}
@@ -393,6 +608,9 @@ export default function EditEmployee() {
                   <option value="2">Finance</option>
                   <option value="3">Business Development</option>
                 </select>
+                {errors["department"] && (
+                  <span className="text-red-600 text-sm mt-1">{errors["department"]}</span>
+                )}
               </div>
 
               {/* Date End */}
@@ -405,6 +623,9 @@ export default function EditEmployee() {
                   onChange={handleChange}
                   className="border p-2 rounded w-full"
                 />
+                {errors["dateEnd"] && (
+                  <span className="text-red-600 text-sm mt-1">{errors["dateEnd"]}</span>
+                )}
               </div>
             </div>
           </section>
@@ -428,6 +649,9 @@ export default function EditEmployee() {
                     onChange={handleChange}
                     className="border p-2 rounded w-full"
                   />
+                  {errors[field] && (
+                    <span className="text-red-600 text-sm mt-1">{errors[field]}</span>
+                  )}
                 </div>
               ))}
             </div>
@@ -450,6 +674,9 @@ export default function EditEmployee() {
                     onChange={handleChange}
                     className="border p-2 rounded w-full"
                   />
+                  {errors[field] && (
+                    <span className="text-red-600 text-sm mt-1">{errors[field]}</span>
+                  )}
                 </div>
               ))}
             </div>
