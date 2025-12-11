@@ -1,10 +1,9 @@
 "use client";
-
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { FiEdit, FiTrash2, FiChevronDown } from "react-icons/fi";
+import { FiEdit, FiTrash2, FiChevronDown, FiFileText } from "react-icons/fi";
 import Layout from "../components/Layout";
 
 // Interface disesuaikan dengan output backend
@@ -55,7 +54,7 @@ interface Employee {
 const divisions = ["Overhead", "Manufacturing", "EPC 1", "EPC 2"];
 const departments = ["HRD", "Finance", "Business Development"];
 
-export default function FulltimeEmployeePage() {
+export default function ParttimeEmployeePage() {
   const [showDivision, setShowDivision] = useState(false);
   const [showDepartment, setShowDepartment] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -68,7 +67,6 @@ export default function FulltimeEmployeePage() {
   // FETCH DATA
   useEffect(() => {
     setLoading(true);
-
     const params = new URLSearchParams();
     if (search.trim() !== "") params.append("keyword", search);
     if (divisionFilter) params.append("division", divisionFilter);
@@ -82,7 +80,7 @@ export default function FulltimeEmployeePage() {
         const arr = Array.isArray(data) ? data : [];
         setEmployees(arr);
         if (search === "" && divisionFilter === "" && departmentFilter === "") {
-          setFilteredEmployees(arr); // total original
+          setFilteredEmployees(arr);
         }
       })
       .catch(() => setEmployees([]))
@@ -92,7 +90,9 @@ export default function FulltimeEmployeePage() {
   // DELETE HANDLER
   const handleDelete = async (nik: number) => {
     if (!confirm("Are you sure to delete this employee?")) return;
-    await fetch(`http://localhost:5000/api/employees/${nik}`, { method: "DELETE" });
+    await fetch(`http://localhost:5000/api/employees/${nik}`, {
+      method: "DELETE"
+    });
     setEmployees(prev => prev.filter(emp => emp.NIK !== nik));
   };
 
@@ -105,6 +105,7 @@ export default function FulltimeEmployeePage() {
         alert("No employee data available");
         return;
       }
+
       console.log(data);
 
       const excelData = data.map(emp => ({
@@ -135,9 +136,7 @@ export default function FulltimeEmployeePage() {
         ContractStart: emp.date_join ? new Date(emp.date_join).toISOString().split('T')[0] : "-",
         ContractEnd: emp.date_end ? new Date(emp.date_end).toISOString().split('T')[0] : "-",
         ContractStatus: emp.contract_status || "-",
-        MCUHistory: emp.last_mcu_date
-          ? new Date(emp.last_mcu_date).toISOString().split("T")[0]
-          : "-",
+        MCUHistory: emp.last_mcu_date ? new Date(emp.last_mcu_date).toISOString().split("T")[0] : "-",
         TrainingList: emp.training_list || "-",
         PhotoFile: emp.photo || "-",
         KTPFile: emp.file_ktp || "-",
@@ -166,7 +165,7 @@ export default function FulltimeEmployeePage() {
 
   return (
     <Layout>
-      {/* header  */}
+      {/* header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
@@ -191,12 +190,14 @@ export default function FulltimeEmployeePage() {
 
           {/* Dropdowns */}
           <div className="flex gap-3 relative">
-
             {/* Division */}
             <div className="relative">
               <button
                 className="flex items-center gap-2 bg-gray-200 rounded-full px-3 py-1 text-sm hover:bg-gray-300 transition"
-                onClick={() => { setShowDivision(!showDivision); setShowDepartment(false); }}
+                onClick={() => {
+                  setShowDivision(!showDivision);
+                  setShowDepartment(false);
+                }}
               >
                 {divisionFilter || "Division"}
                 <FiChevronDown className={`transition-transform duration-200 ${showDivision ? "rotate-180" : ""}`} />
@@ -206,7 +207,10 @@ export default function FulltimeEmployeePage() {
                   <ul className="text-sm text-gray-700">
                     <li
                       className="px-4 py-2 hover:bg-yellow-100 cursor-pointer font-semibold"
-                      onClick={() => { setDivisionFilter(""); setShowDivision(false); }}
+                      onClick={() => {
+                        setDivisionFilter("");
+                        setShowDivision(false);
+                      }}
                     >
                       All Divisions
                     </li>
@@ -214,7 +218,10 @@ export default function FulltimeEmployeePage() {
                       <li
                         key={item}
                         className="px-4 py-2 hover:bg-yellow-100 cursor-pointer"
-                        onClick={() => { setDivisionFilter(item); setShowDivision(false); }}
+                        onClick={() => {
+                          setDivisionFilter(item);
+                          setShowDivision(false);
+                        }}
                       >
                         {item}
                       </li>
@@ -228,7 +235,10 @@ export default function FulltimeEmployeePage() {
             <div className="relative">
               <button
                 className="flex items-center gap-2 bg-gray-200 rounded-full px-3 py-1 text-sm hover:bg-gray-300 transition"
-                onClick={() => { setShowDepartment(!showDepartment); setShowDivision(false); }}
+                onClick={() => {
+                  setShowDepartment(!showDepartment);
+                  setShowDivision(false);
+                }}
               >
                 {departmentFilter || "Department"}
                 <FiChevronDown className={`transition-transform duration-200 ${showDepartment ? "rotate-180" : ""}`} />
@@ -238,7 +248,10 @@ export default function FulltimeEmployeePage() {
                   <ul className="text-sm text-gray-700">
                     <li
                       className="px-4 py-2 hover:bg-yellow-100 cursor-pointer font-semibold"
-                      onClick={() => { setDepartmentFilter(""); setShowDepartment(false); }}
+                      onClick={() => {
+                        setDepartmentFilter("");
+                        setShowDepartment(false);
+                      }}
                     >
                       All Departments
                     </li>
@@ -246,7 +259,10 @@ export default function FulltimeEmployeePage() {
                       <li
                         key={item}
                         className="px-4 py-2 hover:bg-yellow-100 cursor-pointer"
-                        onClick={() => { setDepartmentFilter(item); setShowDepartment(false); }}
+                        onClick={() => {
+                          setDepartmentFilter(item);
+                          setShowDepartment(false);
+                        }}
                       >
                         {item}
                       </li>
@@ -257,9 +273,10 @@ export default function FulltimeEmployeePage() {
             </div>
           </div>
         </div>
+
         <button
           className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-          onClick={downloadAllEmployeesExcel} // <- sambungkan fungsi di sini
+          onClick={downloadAllEmployeesExcel}
         >
           Excel
         </button>
@@ -283,11 +300,10 @@ export default function FulltimeEmployeePage() {
             <th className="border border-gray-300 px-4 py-2">Division</th>
             <th className="border border-gray-300 px-4 py-2">Department</th>
             <th className="border border-gray-300 px-4 py-2">Position</th>
-            <th className="border border-gray-300 px-4 py-2 text-center w-28">Action</th>
+            <th className="border border-gray-300 px-4 py-2 text-center w-40">Action</th>
             <th className="border border-gray-300 px-4 py-2 text-center">Detail</th>
           </tr>
         </thead>
-
         <tbody>
           {employees.length === 0 ? (
             <tr>
@@ -297,40 +313,48 @@ export default function FulltimeEmployeePage() {
             </tr>
           ) : (
             employees.map((emp, index) => (
-              <tr key={index} className="hover:bg-gray-50 transition">
+              <tr key={emp.NIK ?? index} className="hover:bg-gray-50 transition">
                 <td className="border border-gray-300 px-2 py-2 text-center">{index + 1}</td>
                 <td className="border border-gray-300 px-4 py-2">{emp.NIK}</td>
                 <td className="border border-gray-300 px-4 py-2">{emp.name}</td>
                 <td className="border border-gray-300 px-4 py-2">{emp.division_name || "-"}</td>
                 <td className="border border-gray-300 px-4 py-2">{emp.department_name || "-"}</td>
                 <td className="border border-gray-300 px-4 py-2">{emp.position || "-"}</td>
-
                 <td className="border border-gray-300 px-2 py-2 text-center">
                   <div className="flex justify-center gap-2">
-
                     {/* Tombol Edit */}
                     <Link href={`/parttime-employee/edit/${emp.NIK}`}>
                       <button className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 flex items-center gap-1">
-                        <FiEdit size={16} /> Edit
+                        <FiEdit size={16} />
+                        Edit
                       </button>
                     </Link>
-
                     {/* Tombol Delete */}
                     <button
                       onClick={() => handleDelete(emp.NIK)}
                       className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 flex items-center gap-1"
                     >
-                      <FiTrash2 size={16} /> Delete
+                      <FiTrash2 size={16} />
+                      Delete
                     </button>
-
                   </div>
                 </td>
                 <td className="border border-gray-300 px-4 py-2 text-center">
-                  <Link href={`/parttime-employee/detail/${emp.NIK}`}>
-                    <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
-                      View
-                    </button>
-                  </Link>
+                  <div className="flex justify-center gap-2">
+                    {/* Tombol View Detail */}
+                    <Link href={`/parttime-employee/detail/${emp.NIK}`}>
+                      <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
+                        View
+                      </button>
+                    </Link>
+                    {/* Tombol Documents */}
+                    <Link href={`/parttime-employee/document/${emp.NIK}`}>
+                      <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-1">
+                        <FiFileText size={16} />
+                        Docs
+                      </button>
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ))

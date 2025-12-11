@@ -8,7 +8,7 @@ export default function HomePage() {
   return (
     <main
       className="flex flex-col min-h-screen bg-white"
-      style={{ fontFamily: "Cambria, Georgia, serif" }} // ✅ Cambria + fallback
+      style={{ fontFamily: "Cambria, Georgia, serif" }}
     >
       {/* HEADER */}
       <header className="flex justify-between items-center px-10 py-4 bg-[#F8CE0D] border-b border-black">
@@ -26,7 +26,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Tombol login diarahkan ke halaman login */}
         <button
           onClick={() => router.push("/login")}
           className="px-5 py-[4px] bg-[#ffffff] rounded-full text-black text-base font-semibold hover:bg-[#FFF1A8] active:bg-[#FFF1A8] transition-colors duration-200"
@@ -42,7 +41,7 @@ export default function HomePage() {
           background: "linear-gradient(#F8CE0D, #FFFFFF)",
         }}
       >
-        {/* Box dengan background logo */}
+        {/* Box */}
         <div className="relative w-full max-w-5xl bg-white/90 rounded-xl shadow-md overflow-hidden h-[450px]">
           <Image
             src="/image/PT.LKS.jpg"
@@ -51,7 +50,6 @@ export default function HomePage() {
             className="object-cover opacity-20"
           />
 
-          {/* Konten teks */}
           <div className="relative z-10 flex flex-col items-center justify-center text-center h-full px-8">
             <h2 className="mt-3 text-2xl font-semibold text-black">
               Welcome to
@@ -71,7 +69,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* ABOUT SIMKARIN */}
+        {/* ABOUT */}
         <div className="mt-16 text-center max-w-3xl">
           <h2 className="text-3xl font-bold text-black mb-4">
             About SIMKARIN
@@ -85,10 +83,10 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* MAPS */}
+        {/* MAPS — sudah diperbaiki */}
         <div className="mt-10 w-full">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.0416023617273!2d103.9563!3d1.0835!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31d989f31d17dc73%3A0x92d72e0ac73db2b9!2sPT.%20Lancang%20Kuning%20Sukses!5e0!3m2!1sid!2sid!4v1730000000000!5m2!1sid!2sid"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127634.98924196466!2d103.85636555000001!3d1.0576056999999948!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31d98999a4154f3f%3A0xb0f27f39ad47704c!2sPt.%20Lancang%20Kuning%20Sukses!5e0!3m2!1sid!2sid!4v1733910617725!5m2!1sid!2sid"
             style={{ border: 0 }}
             allowFullScreen
             loading="lazy"
@@ -136,4 +134,3 @@ export default function HomePage() {
     </main>
   );
 }
-

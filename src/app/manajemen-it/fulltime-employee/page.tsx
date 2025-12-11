@@ -4,7 +4,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { FiChevronDown } from "react-icons/fi";
+import { FiChevronDown, FiFileText } from "react-icons/fi";
 import Layout from "../components/Layout";
 
 // Interface disesuaikan dengan output backend
@@ -274,7 +274,7 @@ export default function ManajemenITFulltimeEmployeePage() {
         </div>
         <button
           className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-          onClick={downloadAllEmployeesExcel} // <- sambungkan fungsi di sini
+          onClick={downloadAllEmployeesExcel}
         >
           Excel
         </button>
@@ -306,7 +306,7 @@ export default function ManajemenITFulltimeEmployeePage() {
               <tbody>
                 {filteredEmployees.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-4 text-gray-500 italic">
+                    <td colSpan={7} className="text-center py-4 text-gray-500 italic">
                       No data available
                     </td>
                   </tr>
@@ -328,11 +328,21 @@ export default function ManajemenITFulltimeEmployeePage() {
                         {employee.position || "-"}
                       </td>
                       <td className="border border-gray-300 px-4 py-2 text-center">
-                        <Link href={`/manajemen-it/fulltime-employee/detail/${employee.NIK}`}>
-                          <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
-                            View
-                          </button>
-                        </Link>
+                        <div className="flex justify-center gap-2">
+                          {/* Tombol View Detail */}
+                          <Link href={`/manajemen-it/fulltime-employee/detail/${employee.NIK}`}>
+                            <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">
+                              View
+                            </button>
+                          </Link>
+                          
+                          {/* Tombol Documents */}
+                          <Link href={`/manajemen-it/fulltime-employee/document/${employee.NIK}`}>
+                            <button className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-1">
+                              <FiFileText size={16} /> Docs
+                            </button>
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))

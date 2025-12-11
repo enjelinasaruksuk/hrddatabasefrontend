@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import EmployeeDetailView from "src/app/components/EmployeeDetailView";
 
@@ -9,6 +9,7 @@ export default function ParttimeEmployeeDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const params = useParams();
+  const router = useRouter();
   const nik = params.id;
 
   useEffect(() => {
@@ -45,5 +46,18 @@ export default function ParttimeEmployeeDetail() {
     return <div className="p-10 text-lg font-semibold text-center text-red-600">Data karyawan tidak ditemukan</div>;
   }
 
-  return <EmployeeDetailView employee={employee} basePath="" isGradient={false} />;
+  return (
+    <div className="relative">
+      <EmployeeDetailView employee={employee} basePath="" isGradient={false} />
+      
+      <div className="absolute top-[550px] left-[360px] z-10">
+        <button
+          onClick={() => router.push(`/parttime-employee/document/${nik}`)}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded transition-colors duration-200 shadow-lg"
+        >
+          Supporting Files
+        </button>
+      </div>
+    </div>
+  );
 }
