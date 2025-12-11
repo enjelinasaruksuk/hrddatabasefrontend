@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiLogOut, FiBell, FiUser } from "react-icons/fi";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -10,14 +10,29 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
+  // ===== Ambil jumlah data yang akan expire =====
+  const [notifCount, setNotifCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchReminderCount() {
+      try {
+        const res = await fetch("http://localhost:5000/api/reminder/count");
+        const data = await res.json();
+        setNotifCount(data.total || 0);
+      } catch (error) {
+        console.log("Failed to fetch:", error);
+      }
+    }
+
+    fetchReminderCount();
+  }, []);
+
   const handleLogoutConfirm = () => {
     setShowLogoutModal(false);
-    router.push("/"); // Arahkan ke halaman utama setelah logout
+    router.push("/"); // arahkan ke halaman utama setelah logout
   };
 
-  const handleLogoutCancel = () => {
-    setShowLogoutModal(false);
-  };
+  const handleLogoutCancel = () => setShowLogoutModal(false);
 
   return (
     <div className="min-h-screen bg-gray-100 font-['Cambria']">
@@ -29,7 +44,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             alt="Logo"
             className="w-30 h-30 rounded-sm object-cover"
           />
-
           {/* Clickable Title */}
           <Link
             href={
@@ -39,7 +53,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 ? "/manajemen-it/parttime-employee"
                 : pathname.startsWith("/manajemen-it/contract-employee")
                 ? "/manajemen-it/contract-employee"
-                : "/manajemen-it/dashboard" // Default ke dashboard manajemen-it
+                : "/manajemen-it/dashboard"
             }
             className="absolute left-1/2 transform -translate-x-1/2 text-2xl font-semibold text-gray-800 hover:text-yellow-700 transition"
           >
@@ -59,14 +73,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         {/* Navbar Icons */}
         <div className="flex items-center gap-2">
-          <Link href="/manajemen-it/reminder">
+          <Link href="/manajemen-it/reminder" className="relative">
             <button
               aria-label="reminder"
               className="p-2 rounded-full hover:bg-yellow-200 transition"
             >
               <FiBell size={20} />
             </button>
+            {notifCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] px-[6px] py-[1px] rounded-full font-bold">
+                {notifCount > 9 ? "9+" : notifCount}
+              </span>
+            )}
           </Link>
+
           <Link href="/manajemen-it/profile">
             <button
               aria-label="profile"
@@ -75,6 +95,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <FiUser size={20} />
             </button>
           </Link>
+
           <button
             aria-label="logout"
             onClick={() => setShowLogoutModal(true)}
@@ -98,8 +119,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </h3>
             </div>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to logout? You will be redirected to the
-              home page.
+              Are you sure you want to logout? You will be redirected to the home
+              page.
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -122,7 +143,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* Body Layout */}
       <div className="flex min-h-[calc(100vh-5rem)]">
         {/* Sidebar */}
-        <aside className="bg-gradient-to-b from-yellow-300 to-white p-5 flex flex-col gap-2 font-['Cambria']">
+        <aside className="w-64 bg-gradient-to-b from-yellow-300 to-white p-5 flex flex-col gap-2 font-[Cambria]">
           <Link href="/manajemen-it/dashboard">
             <div
               className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
@@ -192,7 +213,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </Link>
 
-          {/* New Link for Expired Contracts */}
           <Link href="/manajemen-it/contract-employee">
             <div
               className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${

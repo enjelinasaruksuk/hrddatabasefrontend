@@ -239,14 +239,14 @@ export default function ContractEmployeePage() {
                         {item.date_end ? new Date(item.date_end).toLocaleDateString('id-ID') : "-"}
                       </td>
                       <td
-                        className={`border border-gray-400 px-3 py-2 font-bold ${
+                        className={`border border-gray-400 px-3 py-2 font-bold text-center ${
                           typeof daysLeft === "number"
                             ? daysLeft <= 7
-                              ? "text-red-600"
+                              ? "text-red-600 bg-red-50"      // ≤ 7 hari: MERAH + background
                               : daysLeft <= 30
-                              ? "text-orange-600"
-                              : "text-black"
-                            : "text-black"
+                              ? "text-orange-600 bg-orange-50" // 8-30 hari: OREN + background
+                              : "text-green-600 bg-green-50"   // > 30 hari: HIJAU + background
+                            : "text-gray-500"
                         }`}
                       >
                         {typeof daysLeft === "number" ? `${daysLeft} days` : "-"}
