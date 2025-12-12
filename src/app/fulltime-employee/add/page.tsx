@@ -19,10 +19,12 @@ export default function AddFulltimeEmployee() {
     placeOfBirth: "",
     maritalStatus: "",
     phone: "",
+    email: "",
     identityNumber: "",
     lastEducation: "",
     nik: "",
     npwp: "",
+    bankType: "",
     accountNumber: "",
     division: "",
     dateJoin: "",
@@ -60,13 +62,11 @@ export default function AddFulltimeEmployee() {
     expiryDate: "",
   });
 
-  // ADD: Format Rupiah Function
   const formatRupiah = (value: string) => {
     const numberString = value.replace(/[^0-9]/g, "");
     return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  // EDIT: handleChange
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -74,7 +74,6 @@ export default function AddFulltimeEmployee() {
   ) => {
     const { name, value } = e.target;
 
-    // --- Logic umur otomatis ---
     if (name === "dob") {
       const birthDate = new Date(value);
       const today = new Date();
@@ -90,17 +89,15 @@ export default function AddFulltimeEmployee() {
         age: age.toString(),
       });
 
-      return; // stop eksekusi lebih lanjut untuk dob
+      return;
     }
 
-    // === Handle change (NPWP, BPJS dan NIK KTP) ===
     if (numericRules[name]) {
       const onlyNumbers = value.replace(/[^0-9]/g, "");
       setEmployee({ ...employee, [name]: onlyNumbers });
       return;
     }
 
-    // Field payroll yang harus format rupiah
     const salaryFields = [
       "salaryAllIn",
       "fixedAllowance",
@@ -139,7 +136,6 @@ export default function AddFulltimeEmployee() {
     let hasError = false;
     const newErrors: Record<string, string> = {};
 
-    // List field yang wajib diisi
     const requiredFields = [
       "name",
       "motherName",
@@ -149,10 +145,12 @@ export default function AddFulltimeEmployee() {
       "placeOfBirth",
       "maritalStatus",
       "phone",
+      "email",
       "identityNumber",
       "lastEducation",
       "nik",
       "npwp",
+      "bankType",
       "accountNumber",
       "division",
       "dateJoin",
@@ -167,7 +165,6 @@ export default function AddFulltimeEmployee() {
       "bpjsHealth"
     ];
 
-    // Cek setiap field wajib
     requiredFields.forEach((field) => {
       if (!(employee as any)[field]) {
         newErrors[field] = "*This field is required";
@@ -175,21 +172,27 @@ export default function AddFulltimeEmployee() {
       }
     });
 
-    // Validasi training juga
+    if (employee.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(employee.email)) {
+        newErrors["email"] = "*Invalid email format";
+        hasError = true;
+      }
+    }
+
     if (!training.detail) {
-      newErrors["trainingDetail"] = "*Training detail is required";
+      newErrors["trainingDetail"] = "*This field is required";
       hasError = true;
     }
     if (!training.trainingDate) {
-      newErrors["trainingDate"] = "*Training date is required";
+      newErrors["trainingDate"] = "*This field is required";
       hasError = true;
     }
     if (!training.expiryDate) {
-      newErrors["expiryDate"] = "*Expiry date is required";
+      newErrors["expiryDate"] = "*This field is required";
       hasError = true;
     }
 
-    // === File wajib ===
     const requiredFiles = [
       "photo",
       "ktp",
@@ -210,7 +213,6 @@ export default function AddFulltimeEmployee() {
       }
     });
 
-    // Validasi numeric fields
     for (const field in numericRules) {
       const requiredLength = numericRules[field];
       const currentValue = (employee as any)[field];
@@ -224,13 +226,11 @@ export default function AddFulltimeEmployee() {
 
     if (hasError) {
       alert("Please fill all required fields correctly.");
-      return; // stop submit
+      return;
     }
-    
-    // --- Kirim data pakai FormData untuk file ---
+
     const formData = new FormData();
 
-    // Append text fields (BIODATA & EMPLOYMENT)
     formData.append("nik", employee.nik);
     formData.append("name", employee.name);
     formData.append("birth_place", employee.placeOfBirth);
@@ -240,8 +240,10 @@ export default function AddFulltimeEmployee() {
     formData.append("religion", employee.religion);
     formData.append("address", employee.address);
     formData.append("phone_number", employee.phone);
+    formData.append("email", employee.email);
     formData.append("marital_status", employee.maritalStatus);
     formData.append("last_education", employee.lastEducation);
+    formData.append("bank_type", employee.bankType);
     formData.append("bank_account", employee.accountNumber);
     formData.append("identity_number", employee.identityNumber);
     formData.append("tax_number", employee.npwp);
@@ -249,7 +251,6 @@ export default function AddFulltimeEmployee() {
     formData.append("position", employee.position);
     formData.append("employment_type", "fulltime");
 
-    // === TAMBAHAN: KIRIM DATA PAYROLL ===
     formData.append("salary_all_in", employee.salaryAllIn);
     formData.append("salary_basic", employee.salaryBasic);
     formData.append("fixed_allowance", employee.fixedAllowance);
@@ -257,19 +258,15 @@ export default function AddFulltimeEmployee() {
     formData.append("bpjs_employment", employee.bpjsEmployment);
     formData.append("bpjs_health", employee.bpjsHealth);
 
-    // === TAMBAHAN: KIRIM DATA CONTRACT ===
     formData.append("date_join", employee.dateJoin);
     formData.append("date_end", employee.dateEnd);
 
-    // === TAMBAHAN: KIRIM DATA MCU ===
     formData.append("mcu_date", employee.mcuHistory);
 
-    // === KIRIM DATA TRAINING ===
     formData.append("training_detail", training.detail);
     formData.append("training_date", training.trainingDate || "");
     formData.append("expiry_date", training.expiryDate || "");
 
-    // Append files
     requiredFiles.forEach((fileField) => {
       const file = employee.files[fileField];
       if (file) formData.append(fileField, file);
@@ -333,11 +330,12 @@ export default function AddFulltimeEmployee() {
                 {[
                   ["name", "Full Name"],
                   ["motherName", "Mother's Name"],
-                  ["address", "Address (RT/RW, Sub-districts and Villages)"],
+                  ["email", "Email", "email"],
                   ["religion", "Religion"],
+                  ["address", "Address (RT/RW, Sub-districts and Villages)"],
                   ["dob", "Date of Birth", "date"],
-                  ["age", "Age"],
                   ["placeOfBirth", "Place of Birth"],
+                  ["age", "Age"],
                   ["maritalStatus", "Marital Status", "select"],
                   ["phone", "Phone Number"],
                   ["identityNumber", "Identity Number (NIK KTP)"],
@@ -375,6 +373,8 @@ export default function AddFulltimeEmployee() {
                     )}
                   </div>
                 ))}
+
+                {/* Training List */}
                 <div className="col-span-2">
                   <div className="flex gap-2 mb-2 items-end">
                     <div className="flex flex-col w-1/3">
@@ -386,6 +386,9 @@ export default function AddFulltimeEmployee() {
                         onChange={(e) => setTraining({ ...training, detail: e.target.value })}
                         className="border p-2 rounded"
                       />
+                      {errors["trainingDetail"] && (
+                        <span className="text-red-600 text-sm mt-1">{errors["trainingDetail"]}</span>
+                      )}
                     </div>
 
                     <div className="flex flex-col w-1/3">
@@ -396,6 +399,9 @@ export default function AddFulltimeEmployee() {
                         onChange={(e) => setTraining({ ...training, trainingDate: e.target.value })}
                         className="border p-2 rounded"
                       />
+                      {errors["trainingDate"] && (
+                        <span className="text-red-600 text-sm mt-1">{errors["trainingDate"]}</span>
+                      )}
                     </div>
 
                     <div className="flex flex-col w-1/3">
@@ -406,6 +412,9 @@ export default function AddFulltimeEmployee() {
                         onChange={(e) => setTraining({ ...training, expiryDate: e.target.value })}
                         className="border p-2 rounded"
                       />
+                      {errors["expiryDate"] && (
+                        <span className="text-red-600 text-sm mt-1">{errors["expiryDate"]}</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -421,6 +430,7 @@ export default function AddFulltimeEmployee() {
               <div className="grid grid-cols-2 gap-4">
                 {[
                   ["nik", "NIK (Employee Identification Number)"],
+                  ["bankType", "Bank Type"],
                   ["npwp", "NPWP"],
                   ["accountNumber", "Account Number"],
                   ["position", "Position"],
@@ -441,11 +451,10 @@ export default function AddFulltimeEmployee() {
                         {errors[name]}
                       </span>
                     )}
-
                   </div>
                 ))}
 
-                {/* MCU History sebagai tanggal */}
+                {/* MCU History */}
                 <div className="flex flex-col">
                   <label className="font-semibold text-gray-700 mb-1">
                     MCU History
@@ -453,6 +462,7 @@ export default function AddFulltimeEmployee() {
                   <input
                     name="mcuHistory"
                     type="date"
+                    value={employee.mcuHistory}
                     onChange={handleChange}
                     className="border p-2 rounded"
                   />
@@ -463,7 +473,7 @@ export default function AddFulltimeEmployee() {
                   )}
                 </div>
 
-                {/* Dropdown Division */}
+                {/* Division */}
                 <div className="flex flex-col">
                   <label className="font-semibold text-gray-700 mb-1">
                     Division
@@ -480,6 +490,11 @@ export default function AddFulltimeEmployee() {
                     <option value="EPC 1">EPC 1</option>
                     <option value="EPC 2">EPC 2</option>
                   </select>
+                  {errors["division"] && (
+                    <span className="text-red-600 text-sm mt-1">
+                      {errors["division"]}
+                    </span>
+                  )}
                 </div>
 
                 {/* Date Joined */}
@@ -490,6 +505,7 @@ export default function AddFulltimeEmployee() {
                   <input
                     name="dateJoin"
                     type="date"
+                    value={employee.dateJoin}
                     onChange={handleChange}
                     className="border p-2 rounded"
                   />
@@ -498,10 +514,9 @@ export default function AddFulltimeEmployee() {
                       {errors["dateJoin"]}
                     </span>
                   )}
-
                 </div>
 
-                {/* Dropdown Department */}
+                {/* Department */}
                 <div className="flex flex-col">
                   <label className="font-semibold text-gray-700 mb-1">
                     Department
@@ -517,6 +532,11 @@ export default function AddFulltimeEmployee() {
                     <option value="2">Finance</option>
                     <option value="3">Business Development</option>
                   </select>
+                  {errors["department"] && (
+                    <span className="text-red-600 text-sm mt-1">
+                      {errors["department"]}
+                    </span>
+                  )}
                 </div>
 
                 {/* Date End */}
@@ -527,6 +547,7 @@ export default function AddFulltimeEmployee() {
                   <input
                     name="dateEnd"
                     type="date"
+                    value={employee.dateEnd}
                     onChange={handleChange}
                     className="border p-2 rounded"
                   />
@@ -535,7 +556,6 @@ export default function AddFulltimeEmployee() {
                       {errors["dateEnd"]}
                     </span>
                   )}
-
                 </div>
               </div>
             </section>
@@ -603,7 +623,6 @@ export default function AddFulltimeEmployee() {
                         {errors[name]}
                       </span>
                     )}
-
                   </div>
                 ))}
               </div>

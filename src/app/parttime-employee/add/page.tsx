@@ -19,10 +19,12 @@ export default function AddParttimeEmployee() {
     placeOfBirth: "",
     maritalStatus: "",
     phone: "",
+    email: "",
     identityNumber: "",
     lastEducation: "",
     nik: "",
     npwp: "",
+    bankType: "",
     accountNumber: "",
     division: "",
     dateJoin: "",
@@ -90,7 +92,7 @@ export default function AddParttimeEmployee() {
         age: age.toString(),
       });
 
-      return; // stop eksekusi lebih lanjut untuk dob
+      return;
     }
 
     // === Handle change (NPWP, BPJS dan NIK KTP) ===
@@ -149,10 +151,12 @@ export default function AddParttimeEmployee() {
       "placeOfBirth",
       "maritalStatus",
       "phone",
+      "email",
       "identityNumber",
       "lastEducation",
       "nik",
       "npwp",
+      "bankType",
       "accountNumber",
       "division",
       "dateJoin",
@@ -175,17 +179,25 @@ export default function AddParttimeEmployee() {
       }
     });
 
+    if (employee.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(employee.email)) {
+        newErrors["email"] = "*Invalid email format";
+        hasError = true;
+      }
+    }
+
     // Validasi training juga
     if (!training.detail) {
-      newErrors["trainingDetail"] = "*Training detail is required";
+      newErrors["trainingDetail"] = "*This field is required";
       hasError = true;
     }
     if (!training.trainingDate) {
-      newErrors["trainingDate"] = "*Training date is required";
+      newErrors["trainingDate"] = "*This field is required";
       hasError = true;
     }
     if (!training.expiryDate) {
-      newErrors["expiryDate"] = "*Expiry date is required";
+      newErrors["expiryDate"] = "*This field is required";
       hasError = true;
     }
 
@@ -226,11 +238,9 @@ export default function AddParttimeEmployee() {
       alert("Please fill all required fields correctly.");
       return; // stop submit
     }
-    
-    // --- Kirim data pakai FormData untuk file ---
+
     const formData = new FormData();
 
-    // Append text fields (BIODATA & EMPLOYMENT)
     formData.append("nik", employee.nik);
     formData.append("name", employee.name);
     formData.append("birth_place", employee.placeOfBirth);
@@ -240,8 +250,10 @@ export default function AddParttimeEmployee() {
     formData.append("religion", employee.religion);
     formData.append("address", employee.address);
     formData.append("phone_number", employee.phone);
+    formData.append("email", employee.email);
     formData.append("marital_status", employee.maritalStatus);
     formData.append("last_education", employee.lastEducation);
+    formData.append("bank_type", employee.bankType);
     formData.append("bank_account", employee.accountNumber);
     formData.append("identity_number", employee.identityNumber);
     formData.append("tax_number", employee.npwp);
@@ -333,11 +345,12 @@ export default function AddParttimeEmployee() {
                 {[
                   ["name", "Full Name"],
                   ["motherName", "Mother's Name"],
-                  ["address", "Address (RT/RW, Sub-districts and Villages)"],
+                  ["email", "Email", "email"],
                   ["religion", "Religion"],
+                  ["address", "Address (RT/RW, Sub-districts and Villages)"],
                   ["dob", "Date of Birth", "date"],
-                  ["age", "Age"],
                   ["placeOfBirth", "Place of Birth"],
+                  ["age", "Age"],
                   ["maritalStatus", "Marital Status", "select"],
                   ["phone", "Phone Number"],
                   ["identityNumber", "Identity Number (NIK KTP)"],
@@ -375,6 +388,7 @@ export default function AddParttimeEmployee() {
                     )}
                   </div>
                 ))}
+
                 <div className="col-span-2">
                   <div className="flex gap-2 mb-2 items-end">
                     <div className="flex flex-col w-1/3">
@@ -386,6 +400,9 @@ export default function AddParttimeEmployee() {
                         onChange={(e) => setTraining({ ...training, detail: e.target.value })}
                         className="border p-2 rounded"
                       />
+                      {errors["trainingDetail"] && (
+                        <span className="text-red-600 text-sm mt-1">{errors["trainingDetail"]}</span>
+                      )}
                     </div>
 
                     <div className="flex flex-col w-1/3">
@@ -396,6 +413,9 @@ export default function AddParttimeEmployee() {
                         onChange={(e) => setTraining({ ...training, trainingDate: e.target.value })}
                         className="border p-2 rounded"
                       />
+                      {errors["trainingDate"] && (
+                        <span className="text-red-600 text-sm mt-1">{errors["trainingDate"]}</span>
+                      )}
                     </div>
 
                     <div className="flex flex-col w-1/3">
@@ -406,6 +426,9 @@ export default function AddParttimeEmployee() {
                         onChange={(e) => setTraining({ ...training, expiryDate: e.target.value })}
                         className="border p-2 rounded"
                       />
+                      {errors["expiryDate"] && (
+                        <span className="text-red-600 text-sm mt-1">{errors["expiryDate"]}</span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -421,6 +444,7 @@ export default function AddParttimeEmployee() {
               <div className="grid grid-cols-2 gap-4">
                 {[
                   ["nik", "NIK (Employee Identification Number)"],
+                  ["bankType", "Bank Type"],
                   ["npwp", "NPWP"],
                   ["accountNumber", "Account Number"],
                   ["position", "Position"],
@@ -480,6 +504,11 @@ export default function AddParttimeEmployee() {
                     <option value="EPC 1">EPC 1</option>
                     <option value="EPC 2">EPC 2</option>
                   </select>
+                  {errors["division"] && (
+                    <span className="text-red-600 text-sm mt-1">
+                      {errors["division"]}
+                    </span>
+                  )}
                 </div>
 
                 {/* Date Joined */}
@@ -517,6 +546,11 @@ export default function AddParttimeEmployee() {
                     <option value="2">Finance</option>
                     <option value="3">Business Development</option>
                   </select>
+                  {errors["department"] && (
+                    <span className="text-red-600 text-sm mt-1">
+                      {errors["department"]}
+                    </span>
+                  )}
                 </div>
 
                 {/* Date End */}

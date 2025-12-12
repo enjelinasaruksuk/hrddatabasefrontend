@@ -35,9 +35,11 @@ export default function EditEmployee() {
     placeOfBirth: "",
     maritalStatus: "",
     phone: "",
+    email: "",
     identityNumber: "",
     lastEducation: "",
     npwp: "",
+    bankType: "",
     accountNumber: "",
     division: "",
     dateJoin: "",
@@ -67,17 +69,13 @@ export default function EditEmployee() {
     expiryDate: "",
   });
 
-  // --------------------------
   // FORMAT RUPIAH
-  // --------------------------
   const formatRupiah = (value: string) => {
     const numberString = value.replace(/[^0-9]/g, "");
     return numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
-  // --------------------------
   // HANDLE CHANGE
-  // --------------------------
   const handleChange = (e: any) => {
     const { name, value } = e.target;
 
@@ -113,9 +111,7 @@ export default function EditEmployee() {
     setEmployee({ ...employee, [name]: value });
   };
 
-  // --------------------------
   // HANDLE UPLOAD FILE
-  // --------------------------
   const handleFileChange = (e: any) => {
     const { name, files } = e.target;
     if (!files || !files[0]) return;
@@ -131,16 +127,12 @@ export default function EditEmployee() {
     }));
   };
 
-  // --------------------------
   // FETCH DATA EMPLOYEE
-  // --------------------------
   const fetchData = async () => {
     try {
-      // ❌ SALAH - GANTI INI
-      // const res = await fetch(http://localhost:5000/api/employees/${id});
-      // ✅ BENAR - PAKAI INI
+
       const res = await fetch(`http://localhost:5000/api/employees/${id}`);
-      
+
       const raw = await res.json();
       const data = Array.isArray(raw) ? raw[0] : raw;
       console.log("DATA DARI BACKEND:", data);
@@ -150,9 +142,7 @@ export default function EditEmployee() {
       if (data.mcu_history) {
         const mcuParts = data.mcu_history.split("/");
         if (mcuParts.length === 3) {
-          // ❌ SALAH - GANTI INI
-          // mcuHistoryDate = ${mcuParts[2]}-${mcuParts[1]}-${mcuParts[0]};
-          // ✅ BENAR - PAKAI INI
+
           mcuHistoryDate = `${mcuParts[2]}-${mcuParts[1]}-${mcuParts[0]}`;
         }
       }
@@ -165,9 +155,7 @@ export default function EditEmployee() {
         if (match) {
           trainingDetail = match[1].trim();
           const dateParts = match[2].split("/");
-          // ❌ SALAH - GANTI INI
-          // trainingDateParsed = ${dateParts[2]}-${dateParts[1]}-${dateParts[0]};
-          // ✅ BENAR - PAKAI INI
+
           trainingDateParsed = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
         } else {
           trainingDetail = data.training_list;
@@ -190,6 +178,8 @@ export default function EditEmployee() {
         lastEducation: data.last_education || "",
         npwp: data.tax_number || "",
         accountNumber: data.bank_account || "",
+        email: data.email || "",
+        bankType: data.bank_type || "",
 
         // Division / Department
         division: data.division_name || "",
@@ -231,7 +221,7 @@ export default function EditEmployee() {
         trainingDate: trainingDateParsed || data.training_date?.split("T")[0] || "",
         expiryDate: data.expiry_date?.split("T")[0] || "",
       });
-      
+
       console.log("Parsed Training data:", {
         original: data.training_list,
         detail: trainingDetail,
@@ -249,9 +239,7 @@ export default function EditEmployee() {
     if (id) fetchData();
   }, [id]);
 
-  // --------------------------
   // SUBMIT UPDATE
-  // --------------------------
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
@@ -313,9 +301,7 @@ export default function EditEmployee() {
       const requiredLength = numericRules[field];
       const currentValue = (employee as any)[field];
       if (!currentValue || currentValue.length < requiredLength) {
-        // ❌ SALAH - GANTI INI
-        // newErrors[field] = *Minimum ${requiredLength} digits;
-        // ✅ BENAR - PAKAI INI
+
         newErrors[field] = `*Minimum ${requiredLength} digits`;
         hasError = true;
       }
@@ -347,6 +333,8 @@ export default function EditEmployee() {
     formData.append("tax_number", employee.npwp);
     formData.append("department_id", employee.department || "");
     formData.append("position", employee.position);
+    formData.append("email", employee.email);
+    formData.append("bank_type", employee.bankType);
     formData.append("employment_type", "parttime");
 
     // Payroll (convert to number)
@@ -375,9 +363,7 @@ export default function EditEmployee() {
     });
 
     try {
-      // ❌ SALAH - GANTI INI
-      // const res = await fetch(http://localhost:5000/api/employees/${id}, {
-      // ✅ BENAR - PAKAI INI
+
       const res = await fetch(`http://localhost:5000/api/employees/${id}`, {
         method: "PUT",
         body: formData,
@@ -426,49 +412,49 @@ export default function EditEmployee() {
               {[
                 ["name", "Full Name"],
                 ["motherName", "Mother's Name"],
-                ["address", "Address"],
+                ["email", "Email", "email"],
                 ["religion", "Religion"],
+                ["address", "Address (RT/RW, Sub-districts and Villages)"],
                 ["dob", "Date of Birth", "date"],
-                ["age", "Age"],
                 ["placeOfBirth", "Place of Birth"],
+                ["age", "Age"],
+                ["maritalStatus", "Marital Status", "select"],
                 ["phone", "Phone Number"],
-                ["identityNumber", "Identity Number"],
-                ["lastEducation", "Last Education"],
-              ].map(([field, label, type = "text"]) => (
-                <div key={field}>
-                  <label>{label}</label>
-                  <input
-                    type={type}
-                    name={field}
-                    value={(employee as any)[field] || ""}
-                    onChange={handleChange}
-                    className="border p-2 rounded w-full"
-                    readOnly={field === "age"}
-                  />
-                  {errors[field] && (
-                    <span className="text-red-600 text-sm mt-1">{errors[field]}</span>
+                ["identityNumber", "Identity Number (NIK KTP)"],
+                ["lastEducation", "Last Education (Major/Jurusan)"]
+              ].map(([name, label, type = "text"]) => (
+                <div key={name} className="flex flex-col">
+                  <label className="font-semibold text-gray-700 mb-1">{label}</label>
+
+                  {type === "select" ? (
+                    <select
+                      name={name}
+                      value={employee.maritalStatus}
+                      onChange={handleChange}
+                      className="border p-2 rounded bg-white"
+                    >
+                      <option value="" disabled>Select Status</option>
+                      <option value="TK">TK</option>
+                      <option value="K/01">K/01</option>
+                      <option value="K/02">K/02</option>
+                    </select>
+                  ) : (
+                    <input
+                      name={name}
+                      type={name === "age" ? "text" : type}
+                      placeholder={label}
+                      value={(employee as any)[name]}
+                      onChange={handleChange}
+                      className={`border p-2 rounded ${name === "age" ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                      readOnly={name === "age"}
+                    />
+                  )}
+
+                  {errors[name] && (
+                    <span className="text-red-600 text-sm mt-1">{errors[name]}</span>
                   )}
                 </div>
               ))}
-              
-              {/* Marital Status - Dropdown */}
-              <div>
-                <label>Marital Status</label>
-                <select
-                  name="maritalStatus"
-                  value={employee.maritalStatus}
-                  onChange={handleChange}
-                  className="border p-2 rounded w-full bg-white"
-                >
-                  <option value="" disabled>Select Status</option>
-                  <option value="TK">TK</option>
-                  <option value="K/01">K/01</option>
-                  <option value="K/02">K/02</option>
-                </select>
-                {errors["maritalStatus"] && (
-                  <span className="text-red-600 text-sm mt-1">{errors["maritalStatus"]}</span>
-                )}
-              </div>
 
               {/* Training fields - col-span-2 */}
               <div className="col-span-2">
@@ -524,7 +510,8 @@ export default function EditEmployee() {
             <div className="grid grid-cols-2 gap-4">
 
               {[
-                ["nik", "NIK"],
+                ["nik", "NIK (Employee Identification Number)"],
+                ["bankType", "Bank Type"],
                 ["npwp", "NPWP"],
                 ["accountNumber", "Account Number"],
                 ["position", "Position"],
