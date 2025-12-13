@@ -377,6 +377,29 @@ export default function EmployeeDetailView({
               </span>
             </div>
           </Link>
+
+          <Link href="/contract-employee">
+            <div
+              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition ${
+                pathname?.startsWith("/contract-employee")
+                  ? "bg-yellow-200 shadow-sm"
+                  : "hover:bg-yellow-200"
+              }`}
+            >
+              <div className="w-8 h-8 flex items-center justify-center text-black text-xl">
+                ⚠️
+              </div>
+              <span
+                className={`text-sm text-black ${
+                  pathname?.startsWith("/contract-employee")
+                    ? "font-semibold"
+                    : "font-medium"
+                }`}
+              >
+                Expired Contracts
+              </span>
+            </div>
+          </Link>
         </aside>
 
         <main className="flex-1 bg-white p-8 relative">
