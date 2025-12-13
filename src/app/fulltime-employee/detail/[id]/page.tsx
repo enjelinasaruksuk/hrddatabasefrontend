@@ -1,5 +1,4 @@
 "use client";
-
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import EmployeeDetailView from "src/app/components/EmployeeDetailView";
@@ -19,9 +18,17 @@ export default function FulltimeEmployeeDetail() {
       try {
         setLoading(true);
         setError(null);
+        
+        // ✅ PERBAIKAN: Gunakan kurung biasa dengan backtick
         const response = await fetch(`http://localhost:5000/api/employees/${nik}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        // ✅ PERBAIKAN: Gunakan kurung biasa dengan backtick
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
+        console.log("📥 Data employee:", data); // Debug: lihat data yang diterima
         setEmployee(data);
       } catch (err) {
         console.error("Error fetching employee:", err);
@@ -35,23 +42,40 @@ export default function FulltimeEmployeeDetail() {
   }, [nik]);
 
   if (loading) {
-    return <div className="p-10 text-lg font-semibold text-center">Loading employee data...</div>;
+    return (
+      <div className="p-10 text-lg font-semibold text-center">
+        Loading employee data...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="p-10 text-lg font-semibold text-center text-red-600">Error: {error}</div>;
+    return (
+      <div className="p-10 text-lg font-semibold text-center text-red-600">
+        Error: {error}
+      </div>
+    );
   }
 
   if (!employee) {
-    return <div className="p-10 text-lg font-semibold text-center text-red-600">Employee data not found</div>;
+    return (
+      <div className="p-10 text-lg font-semibold text-center text-red-600">
+        Employee data not found
+      </div>
+    );
   }
 
   return (
     <div className="relative">
-      <EmployeeDetailView employee={employee} basePath="" isGradient={false} />
+      <EmployeeDetailView 
+        employee={employee} 
+        basePath="" 
+        isGradient={false} 
+      />
       
       <div className="absolute top-[550px] left-[360px] z-10">
         <button
+          // ✅ PERBAIKAN: Gunakan kurung biasa dengan backtick
           onClick={() => router.push(`/fulltime-employee/document/${nik}`)}
           className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded transition-colors duration-200 shadow-lg"
         >
