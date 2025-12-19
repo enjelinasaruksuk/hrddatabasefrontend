@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiLogOut, FiBell, FiUser } from "react-icons/fi";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -37,8 +37,24 @@ export default function EmployeeDetailView({
 }: EmployeeDetailViewProps) {
   const [isClicked, setIsClicked] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [notifCount, setNotifCount] = useState(0); // ✅ State untuk notifikasi
   const pathname = usePathname();
   const router = useRouter();
+
+  // ✅ Fetch jumlah notifikasi saat komponen di-mount
+  useEffect(() => {
+    async function fetchReminderCount() {
+      try {
+        const res = await fetch("http://localhost:5000/api/reminder/count");
+        const data = await res.json();
+        setNotifCount(data.total || 0);
+      } catch (error) {
+        console.log("Failed to fetch reminder count:", error);
+      }
+    }
+
+    fetchReminderCount();
+  }, []);
 
   const loadImage = (url: string): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -97,13 +113,13 @@ export default function EmployeeDetailView({
     yPos += 15;
 
     // Layout settings - posisi gambar dan tabel
-    const photoX = 14;          // Posisi X gambar (kiri)
-    const photoY = yPos;        // Posisi Y gambar
-    const photoWidth = 40;      // Lebar gambar
-    const photoHeight = 50;     // Tinggi gambar
+    const photoX = 14;
+    const photoY = yPos;
+    const photoWidth = 40;
+    const photoHeight = 50;
     
-    const tableX = photoX + photoWidth + 5;  // Posisi X tabel (kanan gambar + spacing)
-    const tableWidth = pageWidth - tableX - 14; // Lebar tabel
+    const tableX = photoX + photoWidth + 5;
+    const tableWidth = pageWidth - tableX - 14;
 
     // Gambar di sebelah KIRI
     if (employee.photo) {
@@ -112,7 +128,6 @@ export default function EmployeeDetailView({
         const imgUrl = `http://localhost:5000/uploads/${employee.photo}`;
         const imgData = await loadImage(imgUrl);
         
-        // Tambahkan gambar
         doc.addImage(imgData, 'JPEG', photoX, photoY, photoWidth, photoHeight);
         doc.setDrawColor(0);
         doc.setLineWidth(0.5);
@@ -122,7 +137,6 @@ export default function EmployeeDetailView({
       } catch (err) {
         console.error('❌ Failed to load employee photo:', err);
         
-        // Placeholder jika gagal load
         doc.setFillColor(240, 240, 240);
         doc.rect(photoX, photoY, photoWidth, photoHeight, 'F');
         doc.setDrawColor(180);
@@ -134,7 +148,6 @@ export default function EmployeeDetailView({
         doc.setTextColor(0);
       }
     } else {
-      // Placeholder jika tidak ada foto
       doc.setFillColor(240, 240, 240);
       doc.rect(photoX, photoY, photoWidth, photoHeight, 'F');
       doc.setDrawColor(180);
@@ -177,7 +190,6 @@ export default function EmployeeDetailView({
       styles: { fontSize: 9 }
     });
 
-    // Lanjutkan dengan section lainnya (Employment, Payroll, Benefit) - SEJAJAR DI KANAN
     yPos = (doc as any).lastAutoTable.finalY + 5;
 
     // EMPLOYMENT INFORMATION - sejajar di kanan
@@ -289,11 +301,19 @@ export default function EmployeeDetailView({
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <Link href={`${basePath}/reminder`}>
+          {/* ✅ Badge Notifikasi dengan Link */}
+          <Link href={`${basePath}/reminder`} className="relative">
             <button aria-label="reminder" className="p-2 rounded-full hover:bg-yellow-200 transition">
               <FiBell size={20} />
             </button>
+            
+            {notifCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] px-[6px] py-[1px] rounded-full font-bold">
+                {notifCount > 9 ? "9+" : notifCount}
+              </span>
+            )}
           </Link>
+
           <Link href={`${basePath}/profile`}>
             <button aria-label="profile" className="p-2 rounded-full hover:bg-yellow-200 transition">
               <FiUser size={20} />
