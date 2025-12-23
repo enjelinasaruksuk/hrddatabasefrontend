@@ -123,6 +123,14 @@ export default function AddParttimeEmployee() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
     if (files && files[0]) {
+      const maxSize = 5 * 1024 * 1024; // 5MB dalam bytes
+      
+      if (files[0].size > maxSize) {
+        alert(`File ${files[0].name} terlalu besar! Maksimal ukuran file adalah 5MB`);
+        e.target.value = ""; // Reset input
+        return;
+      }
+      
       setEmployee((prev) => ({
         ...prev,
         files: { ...prev.files, [name]: files[0] },
@@ -201,8 +209,8 @@ export default function AddParttimeEmployee() {
       hasError = true;
     }
 
-    // === File wajib ===
-    const requiredFiles = [
+    // === File wajib (hanya photo dan ktp) ===
+    const allFiles = [
       "photo",
       "ktp",
       "npwpFile",
@@ -215,7 +223,7 @@ export default function AddParttimeEmployee() {
       "degreeCertificate"
     ];
 
-    requiredFiles.forEach((fileField) => {
+    ["photo", "ktp"].forEach((fileField) => {
       if (!employee.files[fileField]) {
         newErrors[fileField] = "*This file is required";
         hasError = true;
@@ -281,8 +289,8 @@ export default function AddParttimeEmployee() {
     formData.append("training_date", training.trainingDate || "");
     formData.append("expiry_date", training.expiryDate || "");
 
-    // Append files
-    requiredFiles.forEach((fileField) => {
+    // Append files (semua yang ada, baik wajib maupun opsional)
+    allFiles.forEach((fileField) => {
       const file = employee.files[fileField];
       if (file) formData.append(fileField, file);
     });
@@ -652,15 +660,15 @@ export default function AddParttimeEmployee() {
               <div className="grid grid-cols-2 gap-6">
                 {[
                   ["photo", "Photo (Formal)"],
-                  ["ktp", "Identity Card (KTP)"],
-                  ["npwpFile", "Tax Number (NPWP)"],
-                  ["bpjsKesehatan", "BPJS Health Insurance"],
-                  ["bpjsKetenagakerjaan", "BPJS Employment Insurance"],
-                  ["kartukeluarga", "Family Card (KK)"],
-                  ["sertifikattraining", "Training Certificate"],
-                  ["hasilmcu", "Medical Check Up Result"],
-                  ["cvkaryawan", "CV / Resume"],
-                  ["degreeCertificate", "Degree Certificate / Ijazah"]
+                  ["ktp", "Identity Card/KTP"],
+                  ["npwpFile", "Tax Number/NPWP (Optional)"],
+                  ["bpjsKesehatan", "BPJS Health Insurance (Optional)"],
+                  ["bpjsKetenagakerjaan", "BPJS Employment Insurance (Optional)"],
+                  ["kartukeluarga", "Family Card/KK (Optional)"],
+                  ["sertifikattraining", "Training Certificate (Optional)"],
+                  ["hasilmcu", "Medical Check Up Result (Optional)"],
+                  ["cvkaryawan", "CV/Resume (Optional)"],
+                  ["degreeCertificate", "Degree Certificate/Ijazah (Optional)"]
                 ].map(([name, label]) => (
                   <div key={name} className="flex flex-col">
                     <label className="font-semibold mb-1 text-gray-800">

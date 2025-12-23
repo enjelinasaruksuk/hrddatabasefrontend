@@ -53,9 +53,9 @@ const res = await fetch("http://localhost:5000/api/reminder/count");
           <Link
             href={
               pathname.startsWith("/fulltime-employee")
-                ? "/fulltime-employee"
+                ? "/Permanent Employee"
                 : pathname.startsWith("/parttime-employee")
-                ? "/parttime-employee"
+                ? "/Contract Employee"
                 : pathname.startsWith("/contract-employee")
                 ? "/contract-employee"
                 : "/"

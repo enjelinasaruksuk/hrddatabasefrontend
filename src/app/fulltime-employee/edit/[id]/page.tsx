@@ -111,10 +111,18 @@ export default function EditEmployee() {
     setEmployee({ ...employee, [name]: value });
   };
 
-  // HANDLE UPLOAD FILE
+  // HANDLE UPLOAD FILE - DENGAN VALIDASI 5MB
   const handleFileChange = (e: any) => {
     const { name, files } = e.target;
     if (!files || !files[0]) return;
+
+    const maxSize = 5 * 1024 * 1024; // 5MB dalam bytes
+    
+    if (files[0].size > maxSize) {
+      alert(`File ${files[0].name} terlalu besar! Maksimal ukuran file adalah 5MB`);
+      e.target.value = ""; // Reset input
+      return;
+    }
 
     setEmployee((prev: any) => ({
       ...prev,
@@ -676,15 +684,15 @@ export default function EditEmployee() {
             <div className="grid grid-cols-2 gap-6">
               {[
                 ["photo", "Photo (Formal)"],
-                ["ktp", "Identity Card (KTP)"],
-                ["npwpFile", "Tax Number (NPWP)"],
-                ["bpjsKesehatan", "BPJS Health Insurance"],
-                ["bpjsKetenagakerjaan", "BPJS Employment Insurance"],
-                ["kartukeluarga", "Family Card (KK)"],
-                ["sertifikattraining", "Training Certificate"],
-                ["hasilmcu", "Medical Check Up Result"],
-                ["cvkaryawan", "CV / Resume"],
-                ["degreeCertificate", "Degree Certificate / Ijazah"]
+                ["ktp", "Identity Card/KTP"],
+                ["npwpFile", "Tax Number/NPWP (Optional)"],
+                ["bpjsKesehatan", "BPJS Health Insurance (Optional)"],
+                ["bpjsKetenagakerjaan", "BPJS Employment Insurance (Optional)"],
+                ["kartukeluarga", "Family Card/KK (Optional)"],
+                ["sertifikattraining", "Training Certificate (Optional)"],
+                ["hasilmcu", "Medical Check Up Result (Optional)"],
+                ["cvkaryawan", "CV/Resume (Optional)"],
+                ["degreeCertificate", "Degree Certificate/Ijazah (Optional)"]
               ].map(([name, label]) => (
                 <div key={name} className="flex flex-col">
                   <label className="font-semibold mb-1 text-gray-800">{label}</label>
