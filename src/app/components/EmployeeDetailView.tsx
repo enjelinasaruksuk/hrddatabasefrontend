@@ -37,11 +37,10 @@ export default function EmployeeDetailView({
 }: EmployeeDetailViewProps) {
   const [isClicked, setIsClicked] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [notifCount, setNotifCount] = useState(0); // ✅ State untuk notifikasi
+  const [notifCount, setNotifCount] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
 
-  // ✅ Fetch jumlah notifikasi saat komponen di-mount
   useEffect(() => {
     async function fetchReminderCount() {
       try {
@@ -157,7 +156,7 @@ export default function EmployeeDetailView({
       doc.setTextColor(0);
     }
 
-    // BIODATA Section
+    // BIODATA Section (Data sensitif dihapus dari PDF)
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.text("BIODATA", tableX, yPos);
@@ -169,15 +168,12 @@ export default function EmployeeDetailView({
       body: [
         ["Name", employee.name || "-"],
         ["Email", employee.email || "-"],
-        ["Biological Mother's Name", employee.mother_name || "-"],
         ["Address", employee.address || "-"],
         ["Religion", employee.religion || "-"],
         ["Date of Birth", formatDate(employee.birth_date)],
         ["Age", employee.age || "-"],
         ["Place of Birth", employee.birth_place || "-"],
-        ["Marital Status", employee.marital_status || "-"],
         ["Phone Number", employee.phone_number || "-"],
-        ["Identity Number", employee.identity_number || "-"],
         ["Last Education", employee.last_education || "-"],
       ],
       theme: "grid",
@@ -190,7 +186,7 @@ export default function EmployeeDetailView({
 
     yPos = (doc as any).lastAutoTable.finalY + 5;
 
-    // EMPLOYMENT INFORMATION
+    // EMPLOYMENT INFORMATION (Data sensitif dihapus dari PDF)
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.text("EMPLOYMENT INFORMATION", tableX, yPos);
@@ -200,14 +196,10 @@ export default function EmployeeDetailView({
       margin: { left: tableX },
       tableWidth: tableWidth,
       body: [
-        ["NIK", employee.NIK || "-"],
-        ["NPWP", employee.tax_number || "-"],
-        ["Account Number", employee.bank_account || "-"],
         ["Bank Type", employee.bank_type || "-"],
         ["Division", employee.division_name || "-"],
         ["Date on Join", formatDate(employee.date_join)],
         ["Department", employee.department_name || "-"],
-        ["Date of End", formatDate(employee.date_end)],
         ["Position", employee.position || "-"],
         ["MCU History", employee.mcu_history || "-"],
         ["Training List", employee.training_list || "-"],
@@ -222,31 +214,7 @@ export default function EmployeeDetailView({
 
     yPos = (doc as any).lastAutoTable.finalY + 5;
 
-    // PAYROLL INFORMATION
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("PAYROLL INFORMATION", tableX, yPos);
-
-    autoTable(doc, {
-      startY: yPos + 3,
-      margin: { left: tableX },
-      tableWidth: tableWidth,
-      body: [
-        ["All In Salary", formatCurrency(employee.salary_all_in)],
-        ["Fixed Allowance", formatCurrency(employee.fixed_allowance)],
-        ["Basic Salary", formatCurrency(employee.salary_basic)],
-        ["Irregular Allowance", formatCurrency(employee.allowance_irregular)],
-      ],
-      theme: "grid",
-      columnStyles: {
-        0: { cellWidth: 50, fontStyle: "bold" },
-        1: { cellWidth: 'auto' }
-      },
-      styles: { fontSize: 9 }
-    });
-
-    yPos = (doc as any).lastAutoTable.finalY + 5;
-
+    // EMPLOYEE BENEFIT (Payroll Information section dihapus)
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.text("EMPLOYEE BENEFIT", tableX, yPos);
@@ -298,7 +266,6 @@ export default function EmployeeDetailView({
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          {/* ✅ Badge Notifikasi Ditambahkan */}
           <Link href={`${basePath}/reminder`} className="relative">
             <button aria-label="reminder" className="p-2 rounded-full hover:bg-yellow-200 transition">
               <FiBell size={20} />

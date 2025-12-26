@@ -28,20 +28,21 @@ interface EmployeeDetailViewProps {
   employee: any;
   basePath?: string;
   isGradient?: boolean;
+  hidePayroll?: boolean; // ✅ TAMBAHAN: prop untuk hide payroll
 }
 
 export default function EmployeeDetailView({ 
   employee, 
   basePath = "", 
-  isGradient = false 
+  isGradient = false,
+  hidePayroll = false // ✅ TAMBAHAN: default false
 }: EmployeeDetailViewProps) {
   const [isClicked, setIsClicked] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [notifCount, setNotifCount] = useState(0); // ✅ State untuk notifikasi
+  const [notifCount, setNotifCount] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
 
-  // ✅ Fetch jumlah notifikasi saat komponen di-mount
   useEffect(() => {
     async function fetchReminderCount() {
       try {
@@ -112,7 +113,6 @@ export default function EmployeeDetailView({
     
     yPos += 15;
 
-    // Layout settings - posisi gambar dan tabel
     const photoX = 14;
     const photoY = yPos;
     const photoWidth = 40;
@@ -121,10 +121,9 @@ export default function EmployeeDetailView({
     const tableX = photoX + photoWidth + 5;
     const tableWidth = pageWidth - tableX - 14;
 
-    // Gambar di sebelah KIRI
+    // Gambar
     if (employee.photo) {
       try {
-        console.log('🔍 Loading photo:', employee.photo);
         const imgUrl = `http://localhost:5000/uploads/${employee.photo}`;
         const imgData = await loadImage(imgUrl);
         
@@ -132,8 +131,6 @@ export default function EmployeeDetailView({
         doc.setDrawColor(0);
         doc.setLineWidth(0.5);
         doc.rect(photoX, photoY, photoWidth, photoHeight);
-        
-        console.log('✅ Photo added successfully');
       } catch (err) {
         console.error('❌ Failed to load employee photo:', err);
         
@@ -159,7 +156,7 @@ export default function EmployeeDetailView({
       doc.setTextColor(0);
     }
 
-    // BIODATA Section - di sebelah KANAN gambar
+    // BIODATA Section - ✅ HAPUS: Biological Mother's Name, Marital Status, Identity Number
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.text("BIODATA", tableX, yPos);
@@ -171,15 +168,12 @@ export default function EmployeeDetailView({
       body: [
         ["Name", employee.name || "-"],
         ["Email", employee.email || "-"],
-        ["Biological Mother's Name", employee.mother_name || "-"],
         ["Address", employee.address || "-"],
         ["Religion", employee.religion || "-"],
         ["Date of Birth", formatDate(employee.birth_date)],
         ["Age", employee.age || "-"],
         ["Place of Birth", employee.birth_place || "-"],
-        ["Marital Status", employee.marital_status || "-"],
         ["Phone Number", employee.phone_number || "-"],
-        ["Identity Number", employee.identity_number || "-"],
         ["Last Education", employee.last_education || "-"],
       ],
       theme: "grid",
@@ -192,7 +186,7 @@ export default function EmployeeDetailView({
 
     yPos = (doc as any).lastAutoTable.finalY + 5;
 
-    // EMPLOYMENT INFORMATION - sejajar di kanan
+    // EMPLOYMENT INFORMATION - ✅ HAPUS: NIK, NPWP, Account Number, Date of End
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.text("EMPLOYMENT INFORMATION", tableX, yPos);
@@ -202,14 +196,10 @@ export default function EmployeeDetailView({
       margin: { left: tableX },
       tableWidth: tableWidth,
       body: [
-        ["NIK", employee.NIK || "-"],
-        ["NPWP", employee.tax_number || "-"],
-        ["Account Number", employee.bank_account || "-"],
         ["Bank Type", employee.bank_type || "-"],
         ["Division", employee.division_name || "-"],
         ["Date on Join", formatDate(employee.date_join)],
         ["Department", employee.department_name || "-"],
-        ["Date of End", formatDate(employee.date_end)],
         ["Position", employee.position || "-"],
         ["MCU History", employee.mcu_history || "-"],
         ["Training List", employee.training_list || "-"],
@@ -224,32 +214,10 @@ export default function EmployeeDetailView({
 
     yPos = (doc as any).lastAutoTable.finalY + 5;
 
-    // PAYROLL INFORMATION - sejajar di kanan
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("PAYROLL INFORMATION", tableX, yPos);
+    // ✅ HAPUS: Payroll Information tidak ditampilkan di PDF
+    // (Section Payroll Information dihapus sepenuhnya dari PDF)
 
-    autoTable(doc, {
-      startY: yPos + 3,
-      margin: { left: tableX },
-      tableWidth: tableWidth,
-      body: [
-        ["All In Salary", formatCurrency(employee.salary_all_in)],
-        ["Fixed Allowance", formatCurrency(employee.fixed_allowance)],
-        ["Basic Salary", formatCurrency(employee.salary_basic)],
-        ["Irregular Allowance", formatCurrency(employee.allowance_irregular)],
-      ],
-      theme: "grid",
-      columnStyles: {
-        0: { cellWidth: 50, fontStyle: "bold" },
-        1: { cellWidth: 'auto' }
-      },
-      styles: { fontSize: 9 }
-    });
-
-    yPos = (doc as any).lastAutoTable.finalY + 5;
-
-    // EMPLOYEE BENEFIT - sejajar di kanan
+    // EMPLOYEE BENEFIT
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.text("EMPLOYEE BENEFIT", tableX, yPos);
@@ -301,7 +269,6 @@ export default function EmployeeDetailView({
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          {/* ✅ Badge Notifikasi dengan Link */}
           <Link href={`${basePath}/reminder`} className="relative">
             <button aria-label="reminder" className="p-2 rounded-full hover:bg-yellow-200 transition">
               <FiBell size={20} />
@@ -524,19 +491,22 @@ export default function EmployeeDetailView({
                   </div>
                 </section>
 
-                <section>
-                  <h3 className="font-bold text-lg border-b-2 border-gray-300 pb-2 mb-3">Payroll Information</h3>
-                  <div className="grid grid-cols-[180px_1fr] gap-x-4 gap-y-2 text-sm">
-                    <p className="font-medium">All In Salary:</p>
-                    <p className="bg-yellow-100 px-3 py-1.5 rounded">{formatCurrency(employee?.salary_all_in)}</p>
-                    <p className="font-medium">Fixed Allowance:</p>
-                    <p className="bg-yellow-100 px-3 py-1.5 rounded">{formatCurrency(employee?.fixed_allowance)}</p>
-                    <p className="font-medium">Basic Salary:</p>
-                    <p className="bg-yellow-100 px-3 py-1.5 rounded">{formatCurrency(employee?.salary_basic)}</p>
-                    <p className="font-medium">Irregular Allowance:</p>
-                    <p className="bg-yellow-100 px-3 py-1.5 rounded">{formatCurrency(employee?.allowance_irregular)}</p>
-                  </div>
-                </section>
+                {/* ✅ PERBAIKAN: Hanya tampilkan Payroll section jika hidePayroll = false */}
+                {!hidePayroll && (
+                  <section>
+                    <h3 className="font-bold text-lg border-b-2 border-gray-300 pb-2 mb-3">Payroll Information</h3>
+                    <div className="grid grid-cols-[180px_1fr] gap-x-4 gap-y-2 text-sm">
+                      <p className="font-medium">All In Salary:</p>
+                      <p className="bg-yellow-100 px-3 py-1.5 rounded">{formatCurrency(employee?.salary_all_in)}</p>
+                      <p className="font-medium">Fixed Allowance:</p>
+                      <p className="bg-yellow-100 px-3 py-1.5 rounded">{formatCurrency(employee?.fixed_allowance)}</p>
+                      <p className="font-medium">Basic Salary:</p>
+                      <p className="bg-yellow-100 px-3 py-1.5 rounded">{formatCurrency(employee?.salary_basic)}</p>
+                      <p className="font-medium">Irregular Allowance:</p>
+                      <p className="bg-yellow-100 px-3 py-1.5 rounded">{formatCurrency(employee?.allowance_irregular)}</p>
+                    </div>
+                  </section>
+                )}
 
                 <section>
                   <h3 className="font-bold text-lg border-b-2 border-gray-300 pb-2 mb-3">Employee Benefit</h3>
