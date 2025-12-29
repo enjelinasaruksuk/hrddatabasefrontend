@@ -119,72 +119,84 @@ export default function ManajemenITFulltimeEmployeePage() {
   };
 
   const downloadAllEmployeesExcel = async () => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/employees/type/fulltime`);
-      const data: Employee[] = await res.json();
+  try {
+    const res = await fetch(`http://localhost:5000/api/employees/type/fulltime`);
+    const data: Employee[] = await res.json();
 
-      if (!data || data.length === 0) {
-        alert("No employee data available");
-        return;
-      }
-      console.log(data);
-
-      const excelData = data.map(emp => ({
-        NIK: emp.NIK,
-        Name: emp.name || "-",
-        BirthPlace: emp.birth_place || "-",
-        BirthDate: emp.birth_date ? new Date(emp.birth_date).toISOString().split('T')[0] : "-",
-        Age: emp.age ?? "-",
-        MotherName: emp.mother_name || "-",
-        Religion: emp.religion || "-",
-        Address: emp.address || "-",
-        Phone: emp.phone_number || "-",
-        MaritalStatus: emp.marital_status || "-",
-        LastEducation: emp.last_education || "-",
-        BankAccount: emp.bank_account || "-",
-        IdentityNumber: emp.identity_number || "-",
-        TaxNumber: emp.tax_number || "-",
-        Division: emp.division_name || "-",
-        Department: emp.department_name || "-",
-        Position: emp.position || "-",
-        EmploymentType: emp.employment_type || "-",
-        SalaryAllIn: emp.salary_all_in ?? 0,
-        SalaryBasic: emp.salary_basic ?? 0,
-        FixedAllowance: emp.fixed_allowance ?? 0,
-        NonFixedAllowance: emp.allowance_irregular ?? 0,
-        BPJSEmployment: emp.bpjs_employment || "-",
-        BPJSHealth: emp.bpjs_health || "-",
-        ContractStart: emp.date_join ? new Date(emp.date_join).toISOString().split('T')[0] : "-",
-        ContractEnd: emp.date_end ? new Date(emp.date_end).toISOString().split('T')[0] : "-",
-        ContractStatus: emp.contract_status || "-",
-        MCUHistory: emp.last_mcu_date
-          ? new Date(emp.last_mcu_date).toISOString().split("T")[0]
-          : "-",
-        TrainingList: emp.training_list || "-",
-        PhotoFile: emp.photo || "-",
-        KTPFile: emp.file_ktp || "-",
-        NPWPFile: emp.file_npwp || "-",
-        BPJSHealthFile: emp.file_bpjs_kesehatan || "-",
-        BPJSEmploymentFile: emp.file_bpjs_ketenagakerjaan || "-",
-        KKFile: emp.file_kk || "-",
-        TrainingFile: emp.file_training || "-",
-        MCUFile: emp.file_mcu || "-",
-        CVFile: emp.file_cv || "-",
-        DegreeFile: emp.file_ijazah || "-"
-      }));
-
-      const ws = XLSX.utils.json_to_sheet(excelData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Fulltime Employees");
-
-      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-      const blob = new Blob([wbout], { type: "application/octet-stream" });
-      saveAs(blob, "Fulltime Employees.xlsx");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to download Excel");
+    if (!data || data.length === 0) {
+      alert("No employee data available");
+      return;
     }
-  };
+    console.log(data);
+
+    const excelData = data.map(emp => ({
+      NIK: emp.NIK ? String(emp.NIK) : "-",
+      Name: emp.name || "-",
+      BirthPlace: emp.birth_place || "-",
+      BirthDate: emp.birth_date ? new Date(emp.birth_date).toISOString().split('T')[0] : "-",
+      Age: emp.age ?? "-",
+      MotherName: emp.mother_name || "-",
+      Religion: emp.religion || "-",
+      Address: emp.address || "-",
+      Phone: emp.phone_number ? String(emp.phone_number) : "-",
+      MaritalStatus: emp.marital_status || "-",
+      LastEducation: emp.last_education || "-",
+      BankAccount: emp.bank_account ? String(emp.bank_account) : "-",
+      IdentityNumber: emp.identity_number ? String(emp.identity_number) : "-",
+      TaxNumber: emp.tax_number ? String(emp.tax_number) : "-",
+      Division: emp.division_name || "-",
+      Department: emp.department_name || "-",
+      Position: emp.position || "-",
+      EmploymentType: emp.employment_type || "-",
+      BPJSEmployment: emp.bpjs_employment ? String(emp.bpjs_employment) : "-",
+      BPJSHealth: emp.bpjs_health ? String(emp.bpjs_health) : "-",
+      ContractStart: emp.date_join ? new Date(emp.date_join).toISOString().split('T')[0] : "-",
+      ContractEnd: emp.date_end ? new Date(emp.date_end).toISOString().split('T')[0] : "-",
+      ContractStatus: emp.contract_status || "-",
+      MCUHistory: emp.last_mcu_date
+        ? new Date(emp.last_mcu_date).toISOString().split("T")[0]
+        : "-",
+      TrainingList: emp.training_list || "-",
+      PhotoFile: emp.photo || "-",
+      KTPFile: emp.file_ktp || "-",
+      NPWPFile: emp.file_npwp || "-",
+      BPJSHealthFile: emp.file_bpjs_kesehatan || "-",
+      BPJSEmploymentFile: emp.file_bpjs_ketenagakerjaan || "-",
+      KKFile: emp.file_kk || "-",
+      TrainingFile: emp.file_training || "-",
+      MCUFile: emp.file_mcu || "-",
+      CVFile: emp.file_cv || "-",
+      DegreeFile: emp.file_ijazah || "-"
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    
+    // Set format TEXT untuk kolom yang berisi angka panjang
+    const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+    
+    // Kolom A = NIK, I = Phone, L = BankAccount, M = IdentityNumber, N = TaxNumber, R = BPJSEmployment, S = BPJSHealth
+    const textColumns = ['A', 'I', 'L', 'M', 'N', 'R', 'S'];
+    
+    for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+      textColumns.forEach(col => {
+        const cellRef = `${col}${R + 1}`;
+        if (ws[cellRef]) {
+          ws[cellRef].z = '@'; // @ = text format
+        }
+      });
+    }
+    
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Fulltime Employees");
+
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([wbout], { type: "application/octet-stream" });
+    saveAs(blob, "Fulltime Employees.xlsx");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to download Excel");
+  }
+};
 
   return (
     <Layout>

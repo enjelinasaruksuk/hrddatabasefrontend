@@ -100,16 +100,15 @@ export default function ParttimeEmployeePage() {
     try {
       const res = await fetch(`http://localhost:5000/api/employees/type/parttime`);
       const data: Employee[] = await res.json();
-
+  
       if (!data || data.length === 0) {
         alert("No employee data available");
         return;
       }
-
       console.log(data);
-
+  
       const excelData = data.map(emp => ({
-        NIK: emp.NIK,
+        NIK: emp.NIK || "-",
         Name: emp.name || "-",
         BirthPlace: emp.birth_place || "-",
         BirthDate: emp.birth_date ? new Date(emp.birth_date).toISOString().split('T')[0] : "-",
@@ -127,16 +126,18 @@ export default function ParttimeEmployeePage() {
         Department: emp.department_name || "-",
         Position: emp.position || "-",
         EmploymentType: emp.employment_type || "-",
-        SalaryAllIn: emp.salary_all_in ?? 0,
-        SalaryBasic: emp.salary_basic ?? 0,
-        FixedAllowance: emp.fixed_allowance ?? 0,
-        NonFixedAllowance: emp.allowance_irregular ?? 0,
-        BPJSEmployment: emp.bpjs_employment || "-",
-        BPJSHealth: emp.bpjs_health || "-",
+        SalaryAllIn: emp.salary_all_in ? `Rp ${emp.salary_all_in.toLocaleString('id-ID')}` : "Rp 0",
+        SalaryBasic: emp.salary_basic ? `Rp ${emp.salary_basic.toLocaleString('id-ID')}` : "Rp 0",
+        FixedAllowance: emp.fixed_allowance ? `Rp ${emp.fixed_allowance.toLocaleString('id-ID')}` : "Rp 0",
+        NonFixedAllowance: emp.allowance_irregular ? `Rp ${emp.allowance_irregular.toLocaleString('id-ID')}` : "Rp 0",
+        BPJSEmployment: emp.bpjs_employment ? String(emp.bpjs_employment) : "-",
+        BPJSHealth: emp.bpjs_health ? String(emp.bpjs_health) : "-",
         ContractStart: emp.date_join ? new Date(emp.date_join).toISOString().split('T')[0] : "-",
         ContractEnd: emp.date_end ? new Date(emp.date_end).toISOString().split('T')[0] : "-",
         ContractStatus: emp.contract_status || "-",
-        MCUHistory: emp.last_mcu_date ? new Date(emp.last_mcu_date).toISOString().split("T")[0] : "-",
+        MCUHistory: emp.last_mcu_date
+          ? new Date(emp.last_mcu_date).toISOString().split("T")[0]
+          : "-",
         TrainingList: emp.training_list || "-",
         PhotoFile: emp.photo || "-",
         KTPFile: emp.file_ktp || "-",
@@ -149,11 +150,27 @@ export default function ParttimeEmployeePage() {
         CVFile: emp.file_cv || "-",
         DegreeFile: emp.file_ijazah || "-"
       }));
-
+  
       const ws = XLSX.utils.json_to_sheet(excelData);
+      
+      // Set format TEXT untuk kolom yang berisi angka panjang
+      const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+      
+      // Kolom A = NIK, I = Phone, L = BankAccount, M = IdentityNumber, N = TaxNumber, W = BPJSEmployment, X = BPJSHealth
+      const textColumns = ['A', 'I', 'L', 'M', 'N', 'W', 'X'];
+      
+      for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+        textColumns.forEach(col => {
+          const cellRef = `${col}${R + 1}`;
+          if (ws[cellRef]) {
+            ws[cellRef].z = '@'; // @ = text format
+          }
+        });
+      }
+      
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Parttime Employees");
-
+  
       const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
       const blob = new Blob([wbout], { type: "application/octet-stream" });
       saveAs(blob, "Parttime Employees.xlsx");
