@@ -181,9 +181,18 @@ export default function EmployeeDocumentsPage() {
                 <FiArrowLeft className="text-xl" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Employee Support Documents</h1>
-                <p className="text-sm text-gray-600 mt-1">
-                  NIK: {documents?.NIK} - {documents?.name}
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Employee Support Documents
+                </h1>
+
+                <p className="text-lg font-semibold text-gray-800 mt-1">
+                  <span className="font-bold text-gray-900">
+                    NIK: {documents?.NIK}
+                  </span>
+                  <span className="mx-2">–</span>
+                  <span className="uppercase">
+                    {documents?.name}
+                  </span>
                 </p>
               </div>
             </div>
